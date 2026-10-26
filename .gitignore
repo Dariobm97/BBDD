@@ -11,3 +11,12 @@
 
 # Ignorar cualquier archivo que contenga el nombre "examen" 
 *examen*
+
+
+# Ignorar enunciados de prácticas específicas
+/materiales/practicas/enunciados/UD01_practica_01.md
+/materiales/practicas/enunciados/UD02_practica_01.md
+
+# Ignorar rubricas de prácticas específicas
+/materiales/rubricas/UD01_practica_01_rubrica.md
+/materiales/rubricas/UD01_practica_01_rubrica.yml
