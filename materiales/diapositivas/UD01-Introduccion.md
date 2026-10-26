@@ -210,21 +210,74 @@ Antes de comenzar, reflexiona sobre las siguientes preguntas:
 
 # 3. Sistemas gestores de ficheros
 
+
+
+---
+# Ficheros: estructura básica
+
+> **Fichero:** colección de registros, normalmente de estructura homogénea, almacenada en memoria secundaria y gestionada por una aplicación o sistema de archivos.
+
+- **Registro:** conjunto de campos que describe una entidad concreta. Ejemplo: el cliente `11111111A`.
+- **Campo:** unidad de información con nombre, tipo, dominio y, a menudo, longitud.
+- **Clave:** campo o conjunto de campos que identifica un registro sin ambigüedad. Puede ser simple (`NIF`) o compuesta (`ID_PEDIDO, Nº_LINEA`).
+- Operaciones: **alta**, **baja**, **modificación** y **consulta**.
+
+| Campo | Tipo | Ejemplo | Papel |
+|---|---|---|---|
+| `NIF` | CHAR(9) | `11111111A` | clave |
+| `APELLIDOS` | VARCHAR(40) | `Pérez Soto` | dato |
+| `NACIMIENTO` | DATE | `2006-05-18` | dato |
+
+---
+
+# Organización secuencial
+
+Los registros se colocan uno detrás de otro, a menudo ordenados por la clave.
+
+```mermaid
+flowchart LR
+    R1["001 Ana"] --> R2["002 Luis"] --> R3["003 Marta"] --> R4["004 Jorge"]
+```
+
+- **Lectura completa:** muy eficiente para nóminas o facturación por lotes.
+- **Búsqueda puntual:** puede recorrer `N` registros; coste aproximado **O(N)**.
+- Insertar en mitad del fichero puede obligar a desplazar o reescribir registros.
+
+**Ejemplo:** para localizar la clave `004` en 10 000 registros, el peor caso exige examinar los 10 000. La estructura es simple, pero no adecuada para muchas consultas aleatorias.
+
+---
+<!-- _footer: "" -->
+
+# Organización indexada
+
+El fichero de datos mantiene un orden y un **índice** asocia claves o rangos con posiciones o páginas.
+
+```mermaid
+flowchart TD
+    I["Índice: 001→p0 | 050→p40 | 099→p85"]
+    I --> P["Localizar página"] --> R["Leer registro"]
+    D["Datos ordenados: 001 ... 050 ... 099"] --> R
+```
+
+- **Índice primario:** suele construirse sobre la clave de ordenación.
+- **Índice secundario:** acelera búsquedas por otros atributos, por ejemplo `APELLIDOS`.
+- Estructuras frecuentes: **árboles B/B+** e **ISAM**.
+- Ventaja: combina recorrido ordenado y acceso directo razonable.
+- Coste: espacio adicional, mantenimiento y posibles páginas de desbordamiento.
+
+> Un índice no es otra copia completa que sustituya a los datos: es una estructura auxiliar para encontrarlos mejor.
 ---
 
 # Definición y ejemplo
 
 > **Sistema gestor de ficheros:** sistema de almacenamiento en el que los datos se guardan en archivos con una estructura particular.
 
-**Ejemplo:** fichero `CLIENTES` de un banco · **Campo clave:** NIF
-
-| Campo | Nombre | Tipo | Longitud |
-|---|---|---|---|
-| 1 | NIF | Alfanumérico | 10 |
-| 2 | APELLIDOS | Alfanumérico | 20 |
-| 3 | NOMBRE | Alfanumérico | 15 |
-| 4 | NACIMIENTO | Fecha | 8 |
-
+```mermaid
+flowchart TB
+    A[Secretaria - programa A] --> B[alumnos.dat]
+    C[Biblioteca - programa B] --> D[socios.tx]
+    E[Comedor - programa C] --> F[comensales.csv]
+```
 ---
 
 # Caso práctico 1: centro educativo
@@ -399,9 +452,9 @@ Nota
 
 ---
 
-# Actividad: antes y después
+# Antes y después
 
-Comparad las siguientes situaciones:
+
 
 | Con ficheros | Con base de datos |
 |---|---|
@@ -504,6 +557,24 @@ Cada usuario accede solo a lo autorizado.
 | Tipo y longitud de los registros | Reglas de negocio | |
 
 </div>
+
+
+---
+
+# Arquitectura de tres niveles: ANSI/SPARC
+
+```mermaid
+flowchart LR
+    E["Externo\nvistas de usuarios"] --> C["Conceptual\nesquema lógico global"] --> I["Interno\nficheros, páginas e índices"]
+```
+
+| Nivel | Pregunta | Ejemplo |
+|---|---|---|
+| **Externo** | ¿Qué ve cada perfil? | RR. HH. ve DNI y contrato |
+| **Conceptual** | ¿Qué datos y relaciones existen? | `ALUMNOS`, `ASIGNATURAS`, `NOTAS` |
+| **Interno/físico** | ¿Cómo se almacenan? | páginas, índices B+, buffer |
+
+Una vista puede ocultar salario o combinar columnas. El esquema conceptual sigue siendo común; el interno puede cambiar sin que lo sepa la aplicación.
 
 ---
 
@@ -712,6 +783,89 @@ GRANT SELECT ON Alumnos TO profesor_matematicas;
 
 </div>
 </div>
+
+---
+
+<!-- _class: portada -->
+<!-- _paginate: false -->
+
+# Roles en un sistema de base de datos
+
+DA · DBA · Programador de aplicaciones · Usuario final
+
+---
+
+# Administrador de Datos (DA)
+
+Perfil **estratégico y de gestión**, más que técnico.
+
+- Decide **qué datos** necesita la organización y qué significan
+- Asigna responsables a cada conjunto de datos
+- Define políticas de **calidad, privacidad y normativa** (RGPD)
+- Diseña el modelo de datos a nivel **conceptual**
+- No suele trabajar directamente con el SGBD
+
+> El DA decide **el "qué"**
+
+---
+
+# Administrador de la Base de Datos (DBA)
+
+Perfil **técnico** responsable de que la BD funcione.
+
+- Implementa físicamente lo que define el DA (tablas, índices…)
+- Gestiona **usuarios y permisos**
+- Realiza **copias de seguridad** y restauraciones
+- Monitoriza y **optimiza el rendimiento**
+- Actualiza el SGBD y resuelve incidencias
+
+> El DBA se ocupa **del "cómo"**
+
+---
+
+# Programador de aplicaciones
+
+Desarrolla los **programas que acceden a la base de datos**.
+
+- Aplicaciones web, de escritorio o móviles
+- Informes y servicios
+- Escribe el código y las **consultas SQL** que leen, insertan, modifican o borran datos
+
+> Es el **puente** entre la base de datos y el usuario final
+
+---
+
+# Usuario final
+
+Utiliza la información para su trabajo, normalmente **a través de aplicaciones**, sin conocer la estructura interna de la BD.
+
+| Tipo | Características |
+|---|---|
+| **Ocasional** | Consultas puntuales, a veces con herramientas de informes |
+| **Paramétrico** | Operaciones repetitivas y predefinidas (cajero, secretaría) |
+| **Sofisticado** | Lanza consultas directamente, por ejemplo con SQL |
+
+---
+
+# Ejemplo: el instituto
+
+| Rol | Qué haría |
+|---|---|
+| **DA** | Decide que el DNI identifica a cada alumno y que solo Secretaría modifica las direcciones |
+| **DBA** | Crea las tablas en PostgreSQL, da permisos a cada departamento y programa copias nocturnas |
+| **Programador** | Desarrolla la app de préstamos de la biblioteca y la de reservas del comedor |
+| **Usuario final** | La bibliotecaria registra un préstamo; el jefe de estudios consulta un listado |
+
+---
+
+# Resumen
+
+| Rol | Enfoque | Pregunta clave |
+|---|---|---|
+| **DA** | Gestión y políticas | ¿Qué datos necesitamos y quién responde de ellos? |
+| **DBA** | Técnico, SGBD | ¿Cómo almacenamos y protegemos los datos? |
+| **Programador** | Desarrollo | ¿Cómo accede la aplicación a los datos? |
+| **Usuario final** | Uso | ¿Qué información necesito para mi trabajo? |
 
 ---
 

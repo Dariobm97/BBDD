@@ -4,6 +4,7 @@
 # Excepto el propio .gitignore y la carpeta que quieres
 !/.gitignore
 !/materiales/
+!/.github/
 
 # Ignorar cualquier carpeta llamada "soluciones" dentro de la carpeta "materiales"
 /materiales/**/soluciones/
