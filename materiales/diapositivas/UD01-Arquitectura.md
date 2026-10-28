@@ -4,9 +4,9 @@ theme: default
 paginate: true
 size: 16:9
 lang: es
-title: "UD1 - Modelos de bases de datos y arquitectura cliente-servidor"
+title: "UD1 - Modelos de bases de datos y aquitectura de los sistemas de bases de datos"
 header: "Bases de Datos · 1º DAW"
-footer: "UD1 · Modelos y arquitectura cliente-servidor"
+footer: "UD1 · Modelos y arquitectura de los sistemas de bases de datos"
 style: |
   :root {
     --azul: #1f3a5f;
@@ -104,6 +104,9 @@ style: |
   section.portada header, section.portada footer,
   section.seccion header, section.seccion footer { color: #9fb2c8; }
   section.portada::after, section.seccion::after { color: #9fb2c8; }
+  table{
+    margin: 30px auto;
+  }
 ---
 
 <!-- _class: portada -->
@@ -112,10 +115,9 @@ style: |
 <!-- _footer: "" -->
 
 # Bases de Datos
-## Modelos de bases de datos y arquitectura cliente-servidor
+## Modelos de bases de datos y arquitectura de los sistemas de bases de datos
 
 1º Desarrollo de Aplicaciones Web (DAW) · Unidad Didáctica 1
-Colegio Salesiano "San Ignacio" · Cádiz
 
 ---
 
@@ -133,11 +135,10 @@ Colegio Salesiano "San Ignacio" · Cádiz
 </div>
 <div>
 
-6. Arquitectura cliente-servidor
-7. Tipos de configuraciones
-8. Evolución hacia la arquitectura multicapa
-9. Consolidación y autoevaluación
-10. Recursos y resumen
+6. Arquitectura de los sitemas de datos
+7. Clasificar SGBD
+8. Consolidación y autoevaluación
+9. Recursos
 
 </div>
 </div>
@@ -167,13 +168,6 @@ Conviene explicitar esta separación al alumnado desde el principio para que no 
 >
 > **¿Cómo estructurarías esta información?**
 
-### Actividad: organizadores naturales
-
-**Organización:** por parejas · **Duración:** 3 minutos
-
-1. Elegid uno de los ejemplos anteriores.
-2. Dibujad cómo organizaríais esa información.
-3. Explicad las **relaciones** entre los elementos.
 
 <!--
 Pista para el docente: tras la actividad, pedir a 2-3 parejas que muestren su dibujo.
@@ -287,22 +281,6 @@ Esto ilustra que el acceso en el modelo jerárquico es por CAMINOS PREDEFINIDOS:
 | **Mantenimiento** | Cambios estructurales complicados | Reorganizar departamentos |
 
 </div>
-
----
-
-# Contexto histórico
-
-> **Años 60:** primer modelo utilizado de forma masiva.
->
-> **IBM IMS** (*Information Management System*): sistema pionero desarrollado para la misión Apollo.
-
-> **Pregunta de transición:** si un empleado trabaja en **dos** departamentos, ¿cómo lo representarías en un modelo jerárquico?
-
-<!--
-Respuesta esperada: no se puede de forma natural; habría que DUPLICAR el registro del empleado bajo cada departamento.
-Esto conecta con la UD anterior: duplicar = REDUNDANCIA → riesgo de INCONSISTENCIA.
-Es justo el problema que resuelve el modelo en red (siguiente apartado).
--->
 
 ---
 
@@ -683,22 +661,6 @@ ID_CLIENTE en la tabla CLIENTES
 
 ---
 
-# Pregunta de transición
-
-> Después de ver estos tres modelos, ¿cuál crees que es mejor para…
-> - una aplicación móvil sencilla,
-> - un sistema bancario,
-> - una red social global?
-
-<!--
-Respuestas orientativas (no hay una única correcta; lo importante es la justificación):
-- App móvil sencilla: relacional ligero (p. ej., SQLite, que viene integrado en Android/iOS).
-- Sistema bancario: relacional, por la integridad y las transacciones.
-- Red social global: relacional en gran parte, aunque en la práctica se combina con bases de datos NoSQL y de grafos para las relaciones de seguidores.
--->
-
----
-
 <!-- _class: seccion -->
 
 # 5. Comparativa de modelos
@@ -806,539 +768,205 @@ Para cada escenario, **justifica** qué modelo utilizarías:
 
 ---
 
-# Pregunta reflexiva
-
-> ¿Por qué crees que el modelo relacional ha "ganado" la batalla y es el más utilizado actualmente?
-
-**Pistas para el debate:**
-- El estándar SQL.
-- La independencia de datos.
-- La flexibilidad de las consultas.
-- El ecosistema de herramientas.
-
-<!--
-Conectar con la UD anterior: la independencia física y lógica de los datos (arquitectura ANSI/SPARC de tres niveles) es mucho más fácil de conseguir en el modelo relacional porque no hay punteros físicos.
--->
-
----
-
 <!-- _class: seccion -->
 
-# 6. Arquitectura cliente-servidor
+# 6. Arquitectura de los sistemas de bases de datos
+
+Capas, máquinas y ubicación de los datos
 
 ---
 
-# Concepto fundamental
+## Un sistema se describe con cuatro preguntas
 
-> **Arquitectura cliente-servidor:** forma de **organizar los equipos y programas** que participan en la gestión y el uso de una base de datos.
+| # | Pregunta | Qué describe |
+|:---:|---|---|
+| ① | ¿Quién accede? | Número de usuarios |
+| ② | ¿Cómo se organiza el software? | Vista **lógica**: capas |
+| ③ | ¿Dónde se ejecuta cada capa? | Vista **física**: máquinas |
+| ④ | ¿Dónde están los datos? | Ubicación de los datos |
 
-### Cuestión inicial
+> Son preguntas **independientes**: cada una se responde por separado y luego se combinan.
 
-> Cuando accedes a Instagram desde tu móvil…
-> - ¿Dónde están almacenadas tus fotos?
-> - ¿Dónde se procesan los "likes"?
-> - ¿Qué hace exactamente tu móvil?
-
-<div class="nota">
-
-**Nota didáctica:** a partir de aquí cambiamos de pregunta. Hasta ahora estudiábamos **cómo se organizan** los datos (modelo); ahora estudiamos **dónde están** y **quién accede** a ellos (arquitectura).
-
-</div>
+**Ejemplo para toda la presentación:** la aplicación de la biblioteca del instituto.
 
 ---
 
-# División de responsabilidades
+## 1 - ¿Quién accede?
 
-```
- ┌──────────────────────────┐                    ┌──────────────────────────┐
- │         CLIENTE          │   Petición (SQL)   │         SERVIDOR         │
- │                          │ ─────────────────► │                          │
- │  · Interfaz de usuario   │        Red         │  · Almacena la BD        │
- │  · Presenta los datos    │ ◄───────────────── │  · Ejecuta el SGBD       │
- │  · Envía peticiones      │  Resultados/datos  │  · Procesa las consultas │
- └──────────────────────────┘                    └──────────────────────────┘
-```
-
-| Componente | Función | Ubicación |
+| | Monousuario | Multiusuario |
 |---|---|---|
-| **Gestión de datos** | Manipula y administra la BD | Servidor |
-| **Interfaz de usuario** | Muestra la información y permite interactuar | Cliente |
-| **Lógica de aplicación** | Procesa las reglas de negocio | Cliente / Servidor |
+| Usuarios a la vez | Uno | Varios |
+| Control de concurrencia | No es necesario | Imprescindible |
+| Ejemplos | Access en un PC, SQLite en un móvil | PostgreSQL, MySQL, Oracle |
+| En la biblioteca | Un único PC con el programa | Varias bibliotecarias a la vez |
 
 ---
 
-# Actividad: identifica cliente y servidor
 
-Para cada ejemplo, indica qué actúa como cliente y qué como servidor:
+## 2 - ¿Cómo se organiza el software?
 
-| Ejemplo | Cliente | Servidor |
+La aplicación se divide en **tres capas lógicas**, según su responsabilidad:
+
+| Capa | Responsabilidad | En la biblioteca |
 |---|---|---|
-| **Cajero automático** | ? | ? |
-| **Gmail en el navegador** | ? | ? |
-| **Fortnite online** | ? | ? |
-| **Hoja de cálculo con BD local** | ? | ? |
+| 🟦 **Presentación** | Lo que ve y usa el usuario | Pantalla para registrar un préstamo |
+| 🟪 **Lógica de negocio** | Reglas y procesos | "Máximo 3 libros por alumno" |
+| 🟩 **Datos** | Guardar y recuperar la información | SGBD + base de datos |
 
-<div class="nota">
-
-**Recuerda:** "cliente" y "servidor" son **papeles** (roles) que desempeñan los programas, no tipos de ordenador. Un mismo equipo puede hacer de ambos a la vez.
-
-</div>
+> Esto habla de **responsabilidades del código**, no de máquinas.
+> Estas tres capas existen **siempre**, en cualquier aplicación con base de datos.
 
 ---
 
-# Actividad: soluciones
 
-| Ejemplo | Cliente | Servidor |
-|---|---|---|
-| **Cajero automático** | El cajero | Sistema bancario central |
-| **Gmail en el navegador** | El navegador | Servidores de Google |
-| **Fortnite online** | Consola / PC | Servidores de Epic Games |
-| **Hoja de cálculo con BD local** | El mismo ordenador | El mismo ordenador |
+## 3 - ¿Dónde se ejecuta cada capa?
 
-<!--
-El último caso conecta directamente con la "configuración monoequipo" del apartado 7.
-Matiz: una hoja de cálculo (Excel) no es un SGBD; un ejemplo más preciso sería Microsoft Access o SQLite en el propio equipo.
--->
+Ahora tomamos las **mismas tres capas** y las colocamos en máquinas.
 
----
+🟦 Presentación · 🟪 Lógica de negocio · 🟩 Datos
 
-# Ejemplo detallado: banca online
+Las capas **no cambian**. Lo que cambia es **cuántas máquinas hay** y **qué capa va en cada una**.
 
-<div class="columnas">
-<div>
+Tres formas habituales:
 
-### En el cliente (app móvil)
-- Pantalla de inicio de sesión
-- Mostrar el saldo actual
-- Historial de movimientos
-- Formulario de transferencia
-
-</div>
-<div>
-
-### En el servidor
-- Base de datos con las cuentas
-- Validación de credenciales
-- Cálculo de saldos
-- Autorización de operaciones
-
-</div>
-</div>
-
-### Comunicación
-
-```
-Cliente envía:     "LOGIN: usuario123, password456"
-Servidor responde: "OK: Token de sesión ABC123"
-
-Cliente envía:     "CONSULTAR_SALDO: cuenta 12345"
-Servidor responde: "SALDO: 1.250,75 €"
-```
+1. Mono-equipo
+2. Cliente-servidor
+3. Con servidor de aplicaciones
 
 ---
 
-# Banca online: aclaraciones
+## Mono-equipo
 
-<div class="nota">
+| 💻 Equipo único |
+|:---:|
+| 🟦 Presentación |
+| 🟪 Lógica de negocio |
+| 🟩 Datos |
 
-**Nota didáctica 1 (seguridad):** el intercambio anterior es una **simplificación**. En una aplicación real la contraseña nunca viaja en texto plano: la comunicación va **cifrada (HTTPS)** y el servidor no guarda la contraseña, sino un **hash** de ella.
-
-</div>
-
-<div class="nota">
-
-**Nota didáctica 2 (token):** el **token de sesión** evita enviar la contraseña en cada petición. El cliente lo adjunta en las siguientes solicitudes para demostrar que ya se identificó.
-
-</div>
-
-<div class="nota">
-
-**Nota didáctica 3 (lógica):** los cálculos importantes (saldos, autorizaciones) se hacen **siempre en el servidor**. Si se hicieran en el cliente, un usuario podría manipular la app y falsear el resultado.
-
-</div>
+- Las tres capas en **la misma máquina**
+- Normalmente monousuario
+- Biblioteca: un único PC con el programa y la base de datos
 
 ---
 
-# Ventajas de la arquitectura cliente-servidor
+## Cliente-servidor (dos niveles)
 
-| Ventaja | Descripción | Ejemplo |
-|---|---|---|
-| **Centralización** | Datos en un solo lugar | Actualizaciones instantáneas |
-| **Seguridad** | Control centralizado del acceso | Permisos gestionados desde el servidor |
-| **Concurrencia** | Múltiples usuarios simultáneos | Miles de usuarios en WhatsApp |
-| **Mantenimiento** | Cambios solo en el servidor | Actualizar sin reinstalar en cada cliente |
-| **Escalabilidad** | Añadir clientes fácilmente | Nuevos usuarios sin problemas |
-| **Ubicuidad** | Acceso desde cualquier lugar | Teletrabajo |
+| 💻 Cliente | 🖥️ Servidor de BD |
+|:---:|:---:|
+| 🟦 Presentación | |
+| 🟪 Lógica de negocio | |
+| | 🟩 Datos |
 
----
-
-# Desventajas de la arquitectura cliente-servidor
-
-| Desventaja | Descripción | Impacto |
-|---|---|---|
-| **Punto único de fallo** | Si cae el servidor, todo se detiene | Instagram caído = nadie puede usarlo |
-| **Coste de infraestructura** | Servidores potentes y caros | Inversión inicial alta |
-| **Dependencia de la red** | Sin conexión no hay servicio | Sin wifi no hay acceso |
-| **Cuello de botella** | El servidor tiene una capacidad limitada | Lentitud en horas punta |
-
-> **Pregunta de reflexión:** ¿por qué aplicaciones como WhatsApp funcionan incluso con poca conexión, mientras que otras como Instagram necesitan una buena conexión?
-
-<!--
-Pistas para el debate:
-- Un mensaje de texto ocupa muy pocos bytes; una foto o un vídeo, miles de veces más.
-- WhatsApp guarda los mensajes en una cola local y los envía cuando hay red (y guarda el historial en el propio móvil).
-- Instagram descarga continuamente contenido nuevo desde el servidor.
-Idea clave: cuanto más dependa la app de datos del servidor en tiempo real, más le afecta la "dependencia de la red".
--->
+- Los **datos se separan** en un servidor
+- Presentación y lógica en cada cliente → **cliente pesado**
+- Biblioteca: cada PC tiene el programa instalado y se conecta a PostgreSQL
 
 ---
 
-<!-- _class: seccion -->
+## Con servidor de aplicaciones (tres niveles)
 
-# 7. Tipos de configuraciones
+| 💻 Cliente | ⚙️ Servidor de aplicaciones | 🖥️ Servidor de BD |
+|:---:|:---:|:---:|
+| 🟦 Presentación | | |
+| | 🟪 Lógica de negocio | |
+| | | 🟩 Datos |
 
----
-
-# 1. Configuración monoequipo (anfitrión)
-
-> **Cliente y servidor en el mismo equipo.**
-
-```
-   ┌────────────────────────── MI ORDENADOR ───────────────────────────┐
-   │                                                                   │
-   │   Aplicación (cliente)  ◄── lee / escribe ──►  Datos (servidor)   │
-   │                                                                   │
-   └───────────────────────────────────────────────────────────────────┘
-```
-
-**Ejemplo: entorno de desarrollo local**
-- **Situación:** programador trabajando en su proyecto.
-- **Cliente:** navegador web (`localhost:3000`).
-- **Servidor:** MySQL instalado localmente.
-- **BD:** base de datos de pruebas.
-
-<!--
-El original ilustra este caso con Excel + archivo datos.xlsx. Se ha generalizado a "aplicación / datos" porque Excel no es un SGBD.
-El ejemplo del desarrollador local es exactamente lo que harán en clase con XAMPP o MySQL Workbench: conviene decírselo para que lo identifiquen.
--->
+- **Cada capa en su propia máquina**
+- El cliente suele ser solo un navegador → **cliente ligero**
+- Biblioteca: la bibliotecaria usa una web; las reglas viven en el servidor intermedio
 
 ---
 
-# Monoequipo: ventajas y desventajas
+## Clave: capas ≠ niveles
 
-<div class="columnas">
-<div>
-
-### Ventajas
-- **Muy rápido:** sin latencia de red.
-- **Económico:** un solo equipo.
-- **Privado:** los datos no salen del equipo.
-
-</div>
-<div>
-
-### Desventajas
-- **Un solo usuario.**
-- **Sin acceso remoto.**
-- **Recursos limitados.**
-
-</div>
-</div>
-
-<div class="nota">
-
-**Nota didáctica:** `localhost` (o `127.0.0.1`) es el nombre con el que un equipo se refiere **a sí mismo**. Cuando en clase instaléis MySQL en vuestro ordenador y os conectéis a `localhost`, estaréis usando esta configuración.
-
-</div>
-
----
-
-# 2. Cliente/servidor clásico
-
-> **Un servidor dedicado y múltiples clientes.**
-
-```
-     PC Oficina 1 ────┐
-                      │
-     PC Oficina 2 ────┼──── Red ────► SERVIDOR BD ────► Oracle Database
-                      │
-     PC Oficina 3 ────┘
-```
-
-**Ejemplo: sistema de gestión escolar**
-- **Servidor:** equipo ubicado en el centro de datos del colegio.
-- **Clientes:** PC de secretaría, aulas y dirección.
-- **BD:** datos de alumnos, notas y horarios.
-
----
-
-# Actividad: diseña tu red escolar
-
-Identifica a qué información accedería cada usuario:
-
-| Usuario | Pregunta |
-|---|---|
-| **Profesor/a** | ¿Qué puede ver y modificar? |
-| **Secretaría** | ¿Qué permisos necesita? |
-| **Dirección** | ¿Qué nivel de acceso tiene? |
-| **Alumno/a** | ¿Qué puede consultar? |
-
-<div class="nota">
-
-**Conexión con la unidad anterior:** esta actividad aplica dos conceptos ya vistos: las **vistas** (nivel externo: cada usuario ve solo una parte de la BD) y el lenguaje **DCL** (`GRANT` / `REVOKE`) para conceder permisos.
-
-</div>
-
----
-
-# 3. Bases de datos distribuidas
-
-> **La información se reparte entre varios servidores.**
-
-```
-                          Usuario global
-                                │
-                                ▼
-                         Sistema central
-                                │
-          ┌─────────────────────┼─────────────────────┐
-          ▼                     ▼                     ▼
-   Servidor Europa       Servidor América        Servidor Asia
-  (datos de España)    (datos de EE. UU.)     (datos de Japón)
-```
-
-**Ejemplo: Netflix global**
-- **Europa:** perfiles y visualizaciones de usuarios europeos.
-- **América:** datos de usuarios americanos.
-- **Asia:** información de usuarios asiáticos.
-- **Usuario:** percibe "una sola" plataforma Netflix.
-
----
-
-# Bases de datos distribuidas: ventajas y desventajas
-
-<div class="columnas">
-<div>
-
-### Ventajas
-- **Rendimiento:** los datos están cerca del usuario.
-- **Resistencia:** si un servidor cae, los demás siguen funcionando.
-- **Escalabilidad:** se añaden servidores por región.
-
-</div>
-<div>
-
-### Desventajas
-- **Complejidad:** sincronización entre servidores.
-- **Consistencia:** mantener los mismos datos en todos los nodos.
-- **Coste:** múltiples infraestructuras.
-
-</div>
-</div>
-
-<div class="nota">
-
-**Nota didáctica:** que el usuario perciba "una sola" base de datos aunque esté repartida se denomina **transparencia de distribución**. Además, la "resistencia" responde a la principal desventaja del cliente-servidor clásico: el **punto único de fallo**.
-
-</div>
-
----
-
-# 4. Con servidor de aplicaciones
-
-> **Tres capas separadas: cliente, aplicación y base de datos.**
-
-```
-  Navegador web ──HTTP/HTTPS──► Servidor web ──► Servidor de aplicaciones ──SQL──► Servidor BD
-                                (Apache/Nginx)    (PHP / Java / Node.js)         (MySQL/PostgreSQL)
-  └── Capa cliente ──┘          └──────────── Capa aplicación ────────────┘      └─ Capa datos ─┘
-```
-
-**Ejemplo: Moodle (plataforma educativa)**
-
-<div class="tres pequeno">
-<div>
-
-**Capa cliente**
-- Navegador del estudiante o profesor
-- App móvil de Moodle
-
-</div>
-<div>
-
-**Capa aplicación**
-- Servidor con el código PHP de Moodle
-- Gestiona sesiones, permisos y lógica de negocio
-
-</div>
-<div>
-
-**Capa datos**
-- Base de datos MySQL
-- Almacena usuarios, cursos y calificaciones
-
-</div>
-</div>
-
-<!--
-Aclaración: el diagrama tiene 4 cajas pero son 3 capas. El servidor web y el servidor de aplicaciones suelen considerarse parte de la misma capa intermedia (a menudo se ejecutan en la misma máquina, p. ej., Apache con PHP).
--->
-
----
-
-# Actividad: traza la petición
-
-**Escenario:** un estudiante sube una tarea a Moodle.
-
-| Paso | Qué ocurre | Capa |
-|---|---|---|
-| 1 | El estudiante hace clic en "Subir archivo" | Cliente |
-| 2 | El navegador envía una petición HTTP | Cliente → Aplicación |
-| 3 | El servidor web la recibe y procesa | Aplicación |
-| 4 | La aplicación valida permisos y guarda el archivo | Aplicación |
-| 5 | La base de datos almacena los metadatos | Datos |
-| 6 | La confirmación regresa al estudiante | Aplicación → Cliente |
-
-<div class="nota">
-
-**Nota didáctica:** se ha añadido la columna "Capa" para relacionar cada paso con la arquitectura. Los **metadatos** son "datos sobre datos": nombre del archivo, fecha, autor, tamaño… El archivo en sí suele guardarse en disco, no dentro de la BD.
-
-</div>
-
----
-
-# Pregunta comparativa
-
-> ¿Qué configuración utilizarías para…
-> - una tienda con 3 empleados,
-> - un banco nacional,
-> - una startup tecnológica,
-> - un videojuego multijugador global?
-
-<!--
-Respuestas orientativas:
-- Tienda con 3 empleados: monoequipo o cliente/servidor clásico pequeño (un PC hace de servidor).
-- Banco nacional: cliente/servidor con servidor de aplicaciones, con alta disponibilidad y réplicas.
-- Startup tecnológica: multicapa en la nube, para poder crecer sin gran inversión inicial.
-- Videojuego global: base de datos distribuida por regiones (latencia baja para cada jugador).
--->
-
----
-
-<!-- _class: seccion -->
-
-# 8. Evolución hacia la arquitectura multicapa
-
----
-
-# Arquitectura de tres capas (*three-tier*)
-
-> **Separación clara de responsabilidades en tres niveles.**
-
-```
- ┌──────────────────────────────────────────────────────────┐
- │  CAPA DE PRESENTACIÓN                                    │
- │  Interfaces de usuario · Apps móviles · Navegadores web  │
- └──────────────────────────────────────────────────────────┘
-                 │  API REST (HTTP / JSON)
- ┌──────────────────────────────────────────────────────────┐
- │  CAPA DE LÓGICA                                          │
- │  Reglas de negocio · Procesamiento · Validaciones        │
- └──────────────────────────────────────────────────────────┘
-                 │  SQL (conectores de BD)
- ┌──────────────────────────────────────────────────────────┐
- │  CAPA DE DATOS                                           │
- │  Base de datos · Almacenamiento · Consultas              │
- └──────────────────────────────────────────────────────────┘
-```
-
-<div class="nota">
-
-**Atención:** no confundas estas **tres capas** (arquitectura de la aplicación) con los **tres niveles** ANSI/SPARC de la unidad anterior (interno, conceptual y externo), que describen la propia base de datos.
-
-</div>
-
----
-
-# Actividad: diseña Amazon en tres capas
-
-Identifica en qué capa va cada funcionalidad:
-
-| Funcionalidad | Capa de presentación | Capa de lógica | Capa de datos |
+| Arquitectura | 🟦 Presentación | 🟪 Lógica | 🟩 Datos |
 |---|---|---|---|
-| **Carrito de compra** | Interfaz del carrito | Calcular total e impuestos | Productos y precios |
-| **Buscar productos** | Caja de búsqueda | Algoritmo de búsqueda | Catálogo de productos |
-| **Procesar pago** | Formulario de pago | Validar tarjeta y stock | Guardar la transacción |
-| **Reseñas** | Mostrar estrellas | Calcular la media | Comentarios de usuarios |
+| Mono-equipo | Equipo único | Equipo único | Equipo único |
+| Cliente-servidor | Cliente | Cliente | Servidor de BD |
+| Servidor de aplicaciones | Cliente | Servidor de apps | Servidor de BD |
 
-<!--
-Sugerencia didáctica: mostrar primero la tabla solo con la columna "Funcionalidad" (tapando el resto) y que el alumnado proponga el contenido de cada capa. Después revelar la tabla completa.
--->
+- **Capa** (*layer*) → organización **lógica** del software
+- **Nivel** (*tier*) → máquina **física** donde se ejecuta
 
----
-
-# Ejemplo detallado: plataforma de streaming
-
-<div class="tres pequeno">
-<div>
-
-### Capa de presentación
-**App móvil:**
-- Lista de películas
-- Reproductor de vídeo
-- Perfil de usuario
-
-**Navegador web:**
-- Catálogo navegable
-- Sistema de búsqueda
-- Panel de administración
-
-</div>
-<div>
-
-### Capa de lógica de negocio
-**Servidor de aplicaciones:**
-- Algoritmo de recomendaciones
-- Gestión de suscripciones
-- Control de acceso por regiones
-- Transcodificación de vídeos
-
-</div>
-<div>
-
-### Capa de datos
-**Bases de datos:**
-- Catálogo de contenido
-- Perfiles de usuarios
-- Historiales de visualización
-- Datos de facturación
-
-</div>
-</div>
-
-<div class="nota">
-
-**Nota didáctica:** la **transcodificación** consiste en convertir un vídeo a distintos formatos y calidades (4K, HD, móvil…) para adaptarlo al dispositivo y a la conexión de cada usuario.
-
-</div>
+> Con servidor de aplicaciones, capas y niveles coinciden uno a uno.
+> Por eso se confunden, pero **no son lo mismo**.
 
 ---
 
-# Ventajas de la arquitectura multicapa
+## 4 - ¿Dónde están los datos?
 
-| Ventaja | Descripción | Ejemplo |
+| | Centralizada | Distribuida |
 |---|---|---|
-| **Mantenibilidad** | Cambios aislados por capa | Cambiar el diseño sin tocar la BD |
-| **Escalabilidad** | Cada capa escala de forma independiente | Más servidores de aplicación en Black Friday |
-| **Especialización** | Equipos expertos por capa | *Frontend*, *backend*, DBA |
-| **Reutilización** | Una misma lógica para varias interfaces | Una API para web y móvil |
-| **Pruebas** | Pruebas independientes por capa | Tests unitarios de la lógica |
+| Ubicación | Un único sitio | Repartidos en varios nodos en red |
+| Para el usuario | Una base de datos | Una base de datos (aunque esté repartida) |
+| Ventaja | Sencilla de administrar | Disponibilidad, datos cerca de su uso |
+| Inconveniente | Punto único de fallo | Coordinación compleja |
 
-<div class="nota">
+---
 
-**Vocabulario DAW:** el **frontend** es la capa de presentación y el **backend**, la capa de lógica y datos. Son términos que usaréis continuamente en el ciclo.
+## Base de datos distribuida
 
-</div>
+| 💻 Cliente | ⚙️ Servidor de aplicaciones | 🖥️ Nodo A | 🖥️ Nodo B |
+|:---:|:---:|:---:|:---:|
+| 🟦 Presentación | | | |
+| | 🟪 Lógica de negocio | | |
+| | | 🟩 Datos (parte A) | 🟩 Datos (parte B) |
+
+Ahora se reparte **la propia capa de datos**.
+
+- **Homogénea**: todos los nodos usan el mismo SGBD
+- **Heterogénea**: los nodos usan SGBD distintos
+
+---
+
+## Una progresión: cada vez se reparte más
+
+| Arquitectura | Qué se reparte | Ubicación de los datos |
+|---|---|---|
+| Mono-equipo | Nada | Centralizada |
+| Cliente-servidor | Los datos se separan del resto | Centralizada |
+| Servidor de aplicaciones | Cada capa en su máquina | Centralizada |
+| Distribuida | **La capa de datos entre varios nodos** | Distribuida |
+
+> Las tres arquitecturas de la pregunta 3 son **centralizadas**: los datos siguen en un solo sitio.
+
+---
+
+## Ejemplo integrador: la biblioteca
+
+La **misma aplicación**, desplegada de tres formas:
+
+| Pregunta | Un único PC | Programa en cada PC | Aplicación web |
+|---|---|---|---|
+| 1 - ¿Quién accede? | Monousuario | Multiusuario | Multiusuario |
+| 2 - ¿Software? | 3 capas | 3 capas | 3 capas |
+| 3 - ¿Ejecución? | Mono-equipo | Cliente-servidor | Servidor de aplicaciones |
+| 4 - ¿Datos? | Centralizada | Centralizada | Centralizada |
+
+> La **fila 2** no cambia nunca: el software es el mismo, solo cambia dónde se coloca.
+
+---
+
+## Ejercicio: clasifica cada caso
+
+**A.** Una app de notas en el móvil que guarda todo en SQLite.
+
+**B.** Una gestoría con un programa de facturación instalado en cada PC, conectado a un servidor de la oficina.
+
+**C.** La banca online de un banco, con todos sus datos en un único centro de datos.
+
+**D.** Una cadena de tiendas en la que cada tienda tiene su propio servidor MySQL, y la central consulta todos como si fueran uno.
+
+---
+
+## Soluciones
+
+| Caso | 1 - Quién accede | 3 - Ejecución | 4 - Datos |
+|---|---|---|---|
+| **A.** App de notas | Monousuario | Mono-equipo | Centralizada |
+| **B.** Gestoría | Multiusuario | Cliente-servidor | Centralizada |
+| **C.** Banca online | Multiusuario | Servidor de aplicaciones | Centralizada |
+| **D.** Cadena de tiendas | Multiusuario | Cliente-servidor en cada tienda | Distribuida homogénea |
 
 ---
 
@@ -1375,38 +1003,78 @@ Sugerencia didáctica: mostrar primero la tabla solo con la columna "Funcionalid
 La columna "Descripción" se ha añadido para aclarar cada término, ya que en 1º DAW suelen ser conceptos nuevos.
 No es necesario profundizar: basta con que les "suenen" y sepan que son la evolución natural de la arquitectura multicapa.
 -->
-
----
-
-# Actividad final: tu startup multicapa
-
-**Escenario:** crear una plataforma de reparto de comida a domicilio.
-
-1. **Diseña la capa de presentación:** ¿qué interfaces necesitas? (cliente, restaurante, repartidor)
-2. **Define la lógica de negocio:** ¿qué reglas y procesos necesitas?
-3. **Planifica la capa de datos:** ¿qué información hay que almacenar?
-4. **Considera la escalabilidad:** ¿cómo gestionar 1.000 pedidos simultáneos?
-
-> **Pregunta de síntesis:** compara las ventajas de un **monolito tradicional** (todo en un servidor), una **arquitectura de 3 capas** y **microservicios en la nube**. ¿Cuándo utilizarías cada uno?
-
-<!--
-Orientación para la pregunta de síntesis:
-- Monolito: proyectos pequeños o que empiezan; más sencillo de desarrollar y desplegar.
-- 3 capas: la opción "estándar" para la mayoría de aplicaciones web de tamaño medio.
-- Microservicios: sistemas grandes, con muchos equipos y necesidad de escalar partes concretas. Añaden mucha complejidad, por lo que no conviene usarlos "porque sí".
--->
-
 ---
 
 <!-- _class: seccion -->
 
-# 9. Actividades de consolidación
+# 7. Clasificar SGBD
+
+## ¿Una clasificación basta para describir un gestor?
+
+Modelo, usuarios, distribución, propósito y licencia son dimensiones combinables.
 
 ---
 
-# Actividad integradora 1: elige el modelo y la arquitectura
+<!-- content: UD01-C06 -->
+# Clasificar un SGBD
 
-Para cada escenario, decide: **1)** modelo de datos (jerárquico, red o relacional), **2)** arquitectura (monoequipo, cliente-servidor o multicapa) y **3)** justifica la combinación.
+```mermaid
+flowchart TD
+    S["SGBD"] --> M["Modelo"]
+    S --> U["Usuarios"]
+    S --> D["Distribución"]
+    S --> P["Propósito"]
+    S --> L["Licencia y coste"]
+```
+
+| Criterio | Categorías y ejemplos |
+|---|---|
+| Modelo | relacional, jeráquico, en red |
+| Usuarios | monousuario, multiusuario |
+| Distribución | centralizado, distribuido |
+| Propósito | generalista, embebido/específico |
+| Licencia | propietario/comercial, Open Source |
+
+Un producto puede ser simultáneamente multiusuario, relacional, distribuido y comercial.
+
+---
+
+# C06 · Ejemplos y licencia
+
+- **SQLite:** relacional, embebido, sin servidor separado; útil en móvil o aplicaciones locales.
+- **PostgreSQL, MySQL y MariaDB:** relacionales multiusuario de código abierto, con costes posibles de operación y soporte.
+- Un producto propietario puede incluir soporte oficial y funciones empresariales, pero exige revisar licencia, escalabilidad y coste total.
+
+| “Libre” significa… | No significa necesariamente… |
+|---|---|
+| derechos definidos por una licencia abierta | coste operativo cero |
+| posibilidad de estudiar o modificar según licencia | ausencia de soporte profesional |
+| comunidad y ecosistema | que todos los productos sean equivalentes |
+
+---
+
+#  Actividad · Ficha de clasificación
+
+Clasifica una solución que usa SQLite en el móvil y PostgreSQL en el servidor:
+
+- ¿Es monousuario o multiusuario cada componente?
+- ¿Es embebido o generalista?
+- ¿Puede el sistema completo ser híbrido?
+
+**Punto de debate:** las clasificaciones describen dimensiones diferentes. SQLite no deja de ser relacional por ser embebido; PostgreSQL no deja de ser Open Source por admitir soporte comercial.
+
+---
+
+
+<!-- _class: seccion -->
+
+# 8. Actividades de consolidación
+
+---
+
+# Actividad integradora: elige el modelo y la arquitectura
+
+Para cada escenario, decide: **1)** modelo de datos (jerárquico, red o relacional), **2)** arquitectura y **3)** justifica la combinación.
 
 <div class="tres pequeno">
 <div>
@@ -1437,68 +1105,6 @@ Para cada escenario, decide: **1)** modelo de datos (jerárquico, red o relacion
 
 ---
 
-# Actividad 2: role playing (comité de decisión)
-
-**Escenario:** *startup* de transporte compartido (similar a Uber). **Debate:** ¿qué arquitectura implementar?
-
-<div class="columnas pequeno">
-<div>
-
-**Roles:**
-- **CTO** (*Chief Technology Officer*): toma las decisiones técnicas.
-- **CFO** (*Chief Financial Officer*): controla el presupuesto.
-- **Diseñador/a UX:** se centra en la experiencia de usuario.
-- **Experto/a en seguridad:** prioriza la seguridad.
-- **Lead developer:** valora la implementación.
-
-</div>
-<div>
-
-**Aspectos a considerar:**
-- Escalabilidad global
-- Coste de desarrollo
-- Tiempo hasta el lanzamiento
-- Seguridad de los datos
-- Experiencia de usuario
-
-</div>
-</div>
-
----
-
-# Actividad 3: red social universitaria
-
-<div class="columnas pequeno">
-<div>
-
-**Especificaciones:**
-- 10.000 estudiantes
-- 50 universidades
-- Mensajería instantánea
-- Compartir apuntes
-- Grupos de estudio
-
-</div>
-<div>
-
-**Entregables:**
-1. **Modelo de datos:** diseño de tablas y relaciones.
-2. **Arquitectura:** diagrama de componentes.
-3. **Interfaces:** bocetos (*mockups*) de las pantallas principales.
-4. **Escalabilidad:** plan de crecimiento.
-5. **Seguridad:** medidas de protección de datos.
-
-</div>
-</div>
-
-<div class="nota">
-
-**Nota didáctica:** al tratar datos personales de estudiantes, la propuesta de seguridad debería tener en cuenta el **RGPD** (Reglamento General de Protección de Datos).
-
-</div>
-
----
-
 # Autoevaluación (I)
 
 ### Nivel básico
@@ -1524,7 +1130,7 @@ Para cada escenario, decide: **1)** modelo de datos (jerárquico, red o relacion
 
 <!-- _class: seccion -->
 
-# 10. Recursos y resumen
+# 9. Recursos 
 
 ---
 
@@ -1576,48 +1182,6 @@ Corrección: el original atribuye "Database System Concepts" a "Silberschatz, Ga
 
 ---
 
-# Resumen: conceptos clave
-
-| Tema | Conceptos principales |
-|---|---|
-| **Modelos de datos** | Jerárquico (árbol), red (grafo), relacional (tablas) |
-| **Modelo relacional** | Tablas, claves primarias y externas, SQL |
-| **Cliente-servidor** | Separación de responsabilidades, centralización |
-| **Arquitecturas** | Monoequipo, distribuidas, multicapa |
-| **Evolución** | De los grandes ordenadores centrales a los microservicios en la nube |
-
----
-
-# Competencias desarrolladas
-
-<div class="columnas">
-<div>
-
-Al finalizar esta unidad, el alumnado será capaz de:
-
-- **Distinguir** entre los diferentes modelos de datos.
-- **Evaluar** qué modelo usar según el contexto.
-- **Diseñar** arquitecturas cliente-servidor básicas.
-- **Analizar** ventajas y desventajas de cada enfoque.
-- **Aplicar** los conocimientos en casos prácticos reales.
-- **Justificar** decisiones técnicas de diseño.
-
-</div>
-<div>
-
-### Conexión con el futuro
-Estos conocimientos son la base para:
-- El diseño de sistemas empresariales.
-- Las arquitecturas *cloud native*.
-- El desarrollo de aplicaciones modernas.
-- La seguridad en sistemas distribuidos.
-- La escalabilidad y el rendimiento.
-
-</div>
-</div>
-
----
-
 <!-- _class: portada -->
 <!-- _paginate: false -->
 <!-- _header: "" -->
@@ -1625,6 +1189,6 @@ Estos conocimientos son la base para:
 
 # Fin de la presentación
 
-Modelos de bases de datos y arquitectura cliente-servidor
+Modelos de bases de datos y arquitectura de los sistemas de bases de datos
 Bases de Datos · 1º DAW
-Colegio Salesiano "San Ignacio" · Cádiz
+
