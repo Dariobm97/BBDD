@@ -98,8 +98,13 @@ Personas implicadas en el proyecto:
 
 | Incidencia | Problema de los sistemas de ficheros | Explicación aplicada al caso (con datos de los extractos) |
 |---|---|---|
-| I1 | | |
-| … | | |
+| I1 | Redundancia → inconsistencia | Lucía aparece en Cádiz con C/ Sopranis, 12 y en Jerez con C/ Larga, 40. |
+| I2 | Concurrencia | Dos recepcionistas asignaron a la vez la última plaza y acabaron 21 personas para 20 plazas. |
+| I3 | Acceso difícil a los datos | Las sedes usan formatos diferentes, por lo que hay que unificarlos para consultar los datos. |
+| I4 | Falta de seguridad | Los monitores pueden acceder al IBAN de todos los socios. |
+| I5 | Falta de integridad | Aparece una reserva para C-999, pero ese socio no existe en SOCIOS. |
+| I6 | Dependencia entre programas y datos | Al ampliar el campo TELÉFONO, dejó de funcionar el programa de recibos. |
+| I7 | Inconsistencia | Dos socios con tarifa Básica pagan precios diferentes: 30 € y 32 €.
 
 **1.2.** El fichero `RESERVAS` repite en cada registro el nombre del socio, el día, la hora y el monitor de cada clase.
 
@@ -107,11 +112,41 @@ Personas implicadas en el proyecto:
 - **b)** Propón una **reorganización en varios ficheros** que elimine las repeticiones, indicando los campos de cada uno y el **campo clave**.
 - **c)** Define el **formato de registro** del nuevo fichero `SOCIOS` (campo, nombre, tipo y longitud) e indica su campo clave. Justifica por qué no has elegido `NOMBRE` como clave.
 
+1.2.a) Si Andrés Vela deja de impartir Spinning, habría que cambiar su nombre en todas las reservas donde aparezca. Si se olvida alguna, quedarían datos diferentes y se produciría una inconsistencia.
+
+1.2.b) Se pueden separar los datos en varios ficheros. El fichero SOCIOS tendría Nº_SOCIO, DNI, NOMBRE, APELLIDOS, DIRECCIÓN, CP, TELÉFONO, IBAN y TARIFA. Su clave sería Nº_SOCIO.
+
+El fichero MONITORES tendría COD_MONITOR, NOMBRE y APELLIDOS. Su clave sería COD_MONITOR.
+
+El fichero CLASES tendría COD_CLASE, NOMBRE, DÍA, HORA, COD_MONITOR y AFORO. Su clave sería COD_CLASE.
+
+El fichero RESERVAS tendría Nº_SOCIO y COD_CLASE. Su clave sería la combinación de Nº_SOCIO y COD_CLASE.
+
+1.2.c)
+
+El fichero SOCIOS tendría los siguientes campos: Nº_SOCIO, alfanumérico de 10 caracteres; DNI, alfanumérico de 9; NOMBRE, texto de 30; APELLIDOS, texto de 60; DIRECCIÓN, texto de 100; CP, numérico de 5; TELÉFONO, alfanumérico de 15; IBAN, alfanumérico de 34; y TARIFA, alfanumérico de 10.
+
+La clave sería Nº_SOCIO porque identifica de forma única a cada socio. No elegiría NOMBRE porque puede haber varios socios con el mismo nombre.
+
 ---
 
 ### Actividad 2. Utilidad de un Sistema Gestor de Bases de Datos · RA1.d 
 
 **2.1.** Explica cómo resolvería un SGBD **cada una de las incidencias** de la actividad 1. Relaciona cada solución con la **ventaja concreta** del SGBD que la hace posible.
+
+I1: El SGBD tendría los datos de los socios centralizados, por lo que al cambiar la dirección de Lucía se actualizaría una sola vez y el cambio estaría disponible para todas las sedes. Esto evita la redundancia y la inconsistencia de datos.
+
+I2: El SGBD controla el acceso simultáneo de varios usuarios y evita que dos personas puedan reservar la misma última plaza. Esto se consigue gracias al control de concurrencia.
+
+I3: Los datos estarían almacenados en una misma base de datos y con un formato común. Así se podrían realizar consultas sobre las tres sedes sin tener que crear un programa nuevo cada vez. La ventaja es la facilidad para acceder y consultar los datos.
+
+I4: El SGBD permite establecer permisos diferentes para cada usuario. Por ejemplo, los monitores podrían consultar las clases sin tener acceso a los IBAN de los socios. Esto mejora la seguridad de los datos.
+
+I5: Se pueden establecer relaciones entre las tablas y restricciones de integridad. De esta forma, no se podría crear una reserva para un socio que no existe en SOCIOS. Esto garantiza la integridad de los datos.
+
+I6: Los programas trabajan con la base de datos en lugar de depender directamente de la estructura de los ficheros. Por ello, cambiar la longitud de un campo como TELÉFONO no tendría por qué romper el programa de recibos. Esto reduce la dependencia entre los programas y los datos.
+
+I7: El precio de cada tarifa se puede guardar en un único lugar. Por ejemplo, la tarifa Básica tendría un precio concreto y todos los socios que la tengan utilizarían ese precio. Esto evita la redundancia y las inconsistencias.
 
 **2.2.** La gerente se pregunta si el cambio "merece la pena". Analiza qué **inconvenientes** tendrá la implantación de un SGBD **para esta empresa en concreto** y emite una recomendación razonada.
 
