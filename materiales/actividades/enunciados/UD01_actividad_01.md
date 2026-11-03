@@ -98,13 +98,8 @@ Personas implicadas en el proyecto:
 
 | Incidencia | Problema de los sistemas de ficheros | Explicación aplicada al caso (con datos de los extractos) |
 |---|---|---|
-| I1 |Redundancia -> inconsistencia|Lucia en el fichero socio de cadiz c-014 vive en calle sopranis y en el fichero de socios de jerez con j-102 aparece la dirección c/larga.|
-| I2 |Concurrencia|Había 1 plaza libre y se asignaron simultaneamente 2 personas y llegaron a haber 21 en un aforo de 20|
-| I3 |Acceso difícil y asegurar integridad|El informático enfrenta una consulta no prevista|
-| I4 |Seguridad | Los monitores tienen acceso al IBAN de los socios |
-| I5 |Integridad | Falta de información en el fichero socios|
-| I6 |Dependencia | Hacer una extensión en la longitud del campo del teléfono dejó de funcionar el programa de recibos|
-| I7 |Inconsistencia|Que no se sepa la tarifa que hay que pagar y no se controlen los gastos|
+| I1 | | |
+| … | | |
 
 **1.2.** El fichero `RESERVAS` repite en cada registro el nombre del socio, el día, la hora y el monitor de cada clase.
 
@@ -112,26 +107,23 @@ Personas implicadas en el proyecto:
 - **b)** Propón una **reorganización en varios ficheros** que elimine las repeticiones, indicando los campos de cada uno y el **campo clave**.
 - **c)** Define el **formato de registro** del nuevo fichero `SOCIOS` (campo, nombre, tipo y longitud) e indica su campo clave. Justifica por qué no has elegido `NOMBRE` como clave.
 
-1.2.a) Cuando Andrés Vela deje de impartir spinning seguramente haya un problema de integración, un hueco vacío.
-
-1.2.b) 
-Socios: Nº Socio (clave), DNI, nombre, apellidos, dirección, CP, teléfono, IBAN
-Clases: Cod_clase, tarifa, nombre, precio, aforo, plazas libres.
-Reservas: Nombre, dia y hora, monitor
-
-1.3.c) Porque el nombre puede reiterarse
-
 ---
 
 ### Actividad 2. Utilidad de un Sistema Gestor de Bases de Datos · RA1.d 
 
 **2.1.** Explica cómo resolvería un SGBD **cada una de las incidencias** de la actividad 1. Relaciona cada solución con la **ventaja concreta** del SGBD que la hace posible.
 
-
-
 **2.2.** La gerente se pregunta si el cambio "merece la pena". Analiza qué **inconvenientes** tendrá la implantación de un SGBD **para esta empresa en concreto** y emite una recomendación razonada.
 
+La implantación de un SGBD tendrá algunos inconvenientes. La empresa tendrá que pagar la instalación, configuración y mantenimiento del sistema y posiblemente también la formación de los trabajadores. Además, habrá que migrar los datos actuales de las tres sedes y unificar sus formatos. También será necesario hacer copias de seguridad y mantener el sistema para evitar problemas.
+
+Aun así, creo que para Centros Deportivos Atlántico sí merece la pena. Actualmente ya tienen problemas de datos repetidos, reservas simultáneas, falta de seguridad y diferentes formatos entre sedes. Además, tienen previsto pasar de 3 a 20 sedes y aumentar hasta unos 15.000 socios. Por tanto, las ventajas de un SGBD serán mayores que sus inconvenientes y facilitarán el crecimiento de la empresa.
+
 **2.3.** Un monitor que trabaja como entrenador personal por su cuenta, con 12 clientes, guarda en un fichero de texto la fecha y el tipo de sesión de cada cliente. ¿Le recomendarías un SGBD? Justifica tu respuesta comparándola con la de Centros Deportivos Atlántico.
+
+En el caso del monitor con 12 clientes no recomendaría instalar un SGBD. Tiene pocos clientes y solo necesita guardar la fecha y el tipo de sesión, por lo que un fichero de texto puede ser suficiente y más sencillo de mantener.
+
+En cambio, Centros Deportivos Atlántico tiene unos 1.800 socios, varias sedes, muchos usuarios y reservas simultáneas. Además, quiere crecer hasta 20 sedes y unos 15.000 socios. Por eso, en este caso un SGBD sí está justificado.
 
 ---
 
