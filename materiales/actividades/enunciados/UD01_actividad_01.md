@@ -98,8 +98,13 @@ Personas implicadas en el proyecto:
 
 | Incidencia | Problema de los sistemas de ficheros | Explicación aplicada al caso (con datos de los extractos) |
 |---|---|---|
-| I1 | | |
-| … | | |
+| I1 |Redundancia -> inconsistencia|Lucia en el fichero socio de cadiz c-014 vive en calle sopranis y en el fichero de socios de jerez con j-102 aparece la dirección c/larga.|
+| I2 |Concurrencia|Había 1 plaza libre y se asignaron simultaneamente 2 personas y llegaron a haber 21 en un aforo de 20|
+| I3 |Acceso difícil y asegurar integridad|El informático enfrenta una consulta no prevista|
+| I4 |Seguridad | Los monitores tienen acceso al IBAN de los socios |
+| I5 |Integridad | Falta de información en el fichero socios|
+| I6 |Dependencia | Hacer una extensión en la longitud del campo del teléfono dejó de funcionar el programa de recibos|
+| I7 |Inconsistencia|Que no se sepa la tarifa que hay que pagar y no se controlen los gastos|
 
 **1.2.** El fichero `RESERVAS` repite en cada registro el nombre del socio, el día, la hora y el monitor de cada clase.
 
@@ -107,11 +112,22 @@ Personas implicadas en el proyecto:
 - **b)** Propón una **reorganización en varios ficheros** que elimine las repeticiones, indicando los campos de cada uno y el **campo clave**.
 - **c)** Define el **formato de registro** del nuevo fichero `SOCIOS` (campo, nombre, tipo y longitud) e indica su campo clave. Justifica por qué no has elegido `NOMBRE` como clave.
 
+1.2.a) Cuando Andrés Vela deje de impartir spinning seguramente haya un problema de integración, un hueco vacío.
+
+1.2.b) 
+Socios: Nº Socio (clave), DNI, nombre, apellidos, dirección, CP, teléfono, IBAN
+Clases: Cod_clase, tarifa, nombre, precio, aforo, plazas libres.
+Reservas: Nombre, dia y hora, monitor
+
+1.3.c) Porque el nombre puede reiterarse
+
 ---
 
 ### Actividad 2. Utilidad de un Sistema Gestor de Bases de Datos · RA1.d 
 
 **2.1.** Explica cómo resolvería un SGBD **cada una de las incidencias** de la actividad 1. Relaciona cada solución con la **ventaja concreta** del SGBD que la hace posible.
+
+
 
 **2.2.** La gerente se pregunta si el cambio "merece la pena". Analiza qué **inconvenientes** tendrá la implantación de un SGBD **para esta empresa en concreto** y emite una recomendación razonada.
 
