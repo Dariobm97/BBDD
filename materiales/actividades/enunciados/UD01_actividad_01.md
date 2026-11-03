@@ -156,6 +156,10 @@ Aun así, creo que para Centros Deportivos Atlántico sí merece la pena. Actual
 
 **2.3.** Un monitor que trabaja como entrenador personal por su cuenta, con 12 clientes, guarda en un fichero de texto la fecha y el tipo de sesión de cada cliente. ¿Le recomendarías un SGBD? Justifica tu respuesta comparándola con la de Centros Deportivos Atlántico.
 
+En el caso del monitor con 12 clientes no recomendaría instalar un SGBD. Tiene pocos clientes y solo necesita guardar la fecha y el tipo de sesión, por lo que un fichero de texto puede ser suficiente y más sencillo de mantener.
+
+En cambio, Centros Deportivos Atlántico tiene unos 1.800 socios, varias sedes, muchos usuarios y reservas simultáneas. Además, quiere crecer hasta 20 sedes y unos 15.000 socios. Por eso, en este caso un SGBD sí está justificado.
+
 ---
 
 ### Actividad 3. Elementos de un SGBD · RA1.e
