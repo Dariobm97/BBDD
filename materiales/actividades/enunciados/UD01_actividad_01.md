@@ -150,6 +150,10 @@ I7: El precio de cada tarifa se puede guardar en un único lugar. Por ejemplo, l
 
 **2.2.** La gerente se pregunta si el cambio "merece la pena". Analiza qué **inconvenientes** tendrá la implantación de un SGBD **para esta empresa en concreto** y emite una recomendación razonada.
 
+La implantación de un SGBD tendrá algunos inconvenientes. La empresa tendrá que pagar la instalación, configuración y mantenimiento del sistema y posiblemente también la formación de los trabajadores. Además, habrá que migrar los datos actuales de las tres sedes y unificar sus formatos. También será necesario hacer copias de seguridad y mantener el sistema para evitar problemas.
+
+Aun así, creo que para Centros Deportivos Atlántico sí merece la pena. Actualmente ya tienen problemas de datos repetidos, reservas simultáneas, falta de seguridad y diferentes formatos entre sedes. Además, tienen previsto pasar de 3 a 20 sedes y aumentar hasta unos 15.000 socios. Por tanto, las ventajas de un SGBD serán mayores que sus inconvenientes y facilitarán el crecimiento de la empresa.
+
 **2.3.** Un monitor que trabaja como entrenador personal por su cuenta, con 12 clientes, guarda en un fichero de texto la fecha y el tipo de sesión de cada cliente. ¿Le recomendarías un SGBD? Justifica tu respuesta comparándola con la de Centros Deportivos Atlántico.
 
 ---
