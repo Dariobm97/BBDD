@@ -168,16 +168,16 @@ En cambio, Centros Deportivos Atlántico tiene unos 1.800 socios, varias sedes, 
 
 | Nº | Situación | Elemento del SGBD | Tipo de usuario | Justificación |
 |---|---|---|---|---|
-| 1 | La gerente decide que a partir de ahora se registrará un teléfono de emergencia de cada socio. El cambio se aplicará modificando la estructura de la tabla `SOCIOS`. | | | |
-| 2 | El técnico ejecuta `CREATE TABLE RESERVAS (...)`. | | | |
-| 3 | Una recepcionista consulta, desde el programa de recepción, qué clases del jueves tienen plazas libres. | | | |
-| 4 | Se ejecuta `GRANT SELECT ON CLASES TO monitores;` | | | |
-| 5 | El SGBD rechaza una reserva porque el número de socio no existe. | | | |
-| 6 | Dos recepcionistas intentan asignar a la vez la última plaza de Spinning; el SGBD solo acepta una de las dos operaciones. | | | |
-| 7 | El técnico consulta qué tablas existen, qué campos tienen y qué usuarios tienen permisos sobre ellas. | | | |
-| 8 | Administración genera el informe mensual de cuotas con un asistente gráfico, sin escribir código. | | | |
-| 9 | Se cargan en la nueva base de datos los ficheros antiguos de las tres sedes. | | | |
-| 10 | La empresa de desarrollo programa la pantalla de reservas de la app, que resta una plaza libre cada vez que un socio reserva. | | | |
+| 1 | La gerente decide que a partir de ahora se registrará un teléfono de emergencia de cada socio. El cambio se aplicará modificando la estructura de la tabla `SOCIOS`. | DDL | Administrador de datos | El encargado cambia la estructura de la base de datos una tabla en este caso y se ha de añadir nuevos datos en este caso un teléfono de emergencia|
+| 2 | El técnico ejecuta `CREATE TABLE RESERVAS (...)`. | DDL | | |
+| 3 | Una recepcionista consulta, desde el programa de recepción, qué clases del jueves tienen plazas libres. | DML | Usuario final | Hace una consulta de información |
+| 4 | Se ejecuta `GRANT SELECT ON CLASES TO monitores;` | DCL | | |
+| 5 | El SGBD rechaza una reserva porque el número de socio no existe. | núcleo | | |
+| 6 | Dos recepcionistas intentan asignar a la vez la última plaza de Spinning; el SGBD solo acepta una de las dos operaciones. | núcleo  | | |
+| 7 | El técnico consulta qué tablas existen, qué campos tienen y qué usuarios tienen permisos sobre ellas. | DML | | |
+| 8 | Administración genera el informe mensual de cuotas con un asistente gráfico, sin escribir código. | utilidades | | |
+| 9 | Se cargan en la nueva base de datos los ficheros antiguos de las tres sedes. | núcleo | | |
+| 10 | La empresa de desarrollo programa la pantalla de reservas de la app, que resta una plaza libre cada vez que un socio reserva. | núcleo | | |
 
 **3.2.** Analiza los cambios siguientes. Para cada uno, indica **qué nivel de la arquitectura** de la base de datos se modifica (interno, conceptual o externo), **qué tipo de independencia** de datos interviene (si procede) y **qué programas o usuarios se ven afectados**.
 
