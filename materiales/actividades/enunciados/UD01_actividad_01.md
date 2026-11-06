@@ -169,26 +169,32 @@ En cambio, Centros Deportivos Atlántico tiene unos 1.800 socios, varias sedes, 
 | Nº | Situación | Elemento del SGBD | Tipo de usuario | Justificación |
 |---|---|---|---|---|
 | 1 | La gerente decide que a partir de ahora se registrará un teléfono de emergencia de cada socio. El cambio se aplicará modificando la estructura de la tabla `SOCIOS`. | DDL | Administrador de datos | El encargado cambia la estructura de la base de datos una tabla en este caso y se ha de añadir nuevos datos en este caso un teléfono de emergencia|
-| 2 | El técnico ejecuta `CREATE TABLE RESERVAS (...)`. | DDL | | |
+| 2 | El técnico ejecuta `CREATE TABLE RESERVAS (...)`. | DDL | Administrador de la base de datos | crea una nueva tabla |
 | 3 | Una recepcionista consulta, desde el programa de recepción, qué clases del jueves tienen plazas libres. | DML | Usuario final | Hace una consulta de información |
-| 4 | Se ejecuta `GRANT SELECT ON CLASES TO monitores;` | DCL | | |
-| 5 | El SGBD rechaza una reserva porque el número de socio no existe. | núcleo | | |
-| 6 | Dos recepcionistas intentan asignar a la vez la última plaza de Spinning; el SGBD solo acepta una de las dos operaciones. | núcleo  | | |
-| 7 | El técnico consulta qué tablas existen, qué campos tienen y qué usuarios tienen permisos sobre ellas. | DML | | |
-| 8 | Administración genera el informe mensual de cuotas con un asistente gráfico, sin escribir código. | utilidades | | |
-| 9 | Se cargan en la nueva base de datos los ficheros antiguos de las tres sedes. | núcleo | | |
-| 10 | La empresa de desarrollo programa la pantalla de reservas de la app, que resta una plaza libre cada vez que un socio reserva. | núcleo | | |
+| 4 | Se ejecuta `GRANT SELECT ON CLASES TO monitores;` | DCL | Administrador de la BBDD | Dando permisos a monitores |
+| 5 | El SGBD rechaza una reserva porque el número de socio no existe. | núcleo | ninguno | Es el programa el que actúa |
+| 6 | Dos recepcionistas intentan asignar a la vez la última plaza de Spinning; el SGBD solo acepta una de las dos operaciones. | núcleo  | ninguno  | El programa actúa |
+| 7 | El técnico consulta qué tablas existen, qué campos tienen y qué usuarios tienen permisos sobre ellas. | DML |  | |
+| 8 | Administración genera el informe mensual de cuotas con un asistente gráfico, sin escribir código. | utilidades |  | |
+| 9 | Se cargan en la nueva base de datos los ficheros antiguos de las tres sedes. | núcleo |  | |
+| 10 | La empresa de desarrollo programa la pantalla de reservas de la app, que resta una plaza libre cada vez que un socio reserva. | DML | programador de aplicaciones | La aplicación modifica los datos al realizar una reserva |
 
 **3.2.** Analiza los cambios siguientes. Para cada uno, indica **qué nivel de la arquitectura** de la base de datos se modifica (interno, conceptual o externo), **qué tipo de independencia** de datos interviene (si procede) y **qué programas o usuarios se ven afectados**.
 
 | Cambio | Nivel modificado | Independencia | ¿A quién afecta? |
 |---|---|---|---|
-| a) El técnico reorganiza el almacenamiento de `SOCIOS` y crea un índice sobre el DNI para acelerar las búsquedas. | | | |
-| b) Se añade el campo `TELEFONO_EMERGENCIA` a `SOCIOS`. | | | |
-| c) Se crea una vista para los monitores que muestra solo el nombre del socio y sus clases. | | | |
-| d) Se elimina el campo `FAX` de `SOCIOS`, que solo usaba el antiguo programa de envío de cartas. | | | |
+| a) El técnico reorganiza el almacenamiento de `SOCIOS` y crea un índice sobre el DNI para acelerar las búsquedas. | interno | física | Nada se ve afectado  |
+| b) Se añade el campo `TELEFONO_EMERGENCIA` a `SOCIOS`. | Conceptual | Lógica | |
+| c) Se crea una vista para los monitores que muestra solo el nombre del socio y sus clases. | Externo | Lógica | Sólo afecta a los monitores  |
+| d) Se elimina el campo `FAX` de `SOCIOS`, que solo usaba el antiguo programa de envío de cartas. | Conceptual | Lógica | Afecta al antiguo programa |
 
 Por último, compara el cambio *b* con la incidencia **I6** y explica qué ha cambiado gracias al SGBD.
+
+En I6, al ampliar el campo TELÉFONO, el programa de recibos dejó de funcionar. Esto muestra que el programa dependía de la estructura de los datos.
+
+En el cambio b, se añade TELEFONO_EMERGENCIA a SOCIOS. Gracias al SGBD y a la arquitectura de tres niveles, este cambio puede hacerse sin afectar necesariamente a los programas que no utilizan ese nuevo campo.
+
+En decir el SGBD permite que los cambios en la estructura de los datos afecten lo menos posible a los programas. Esto es la independencia de datos.
 
 ---
 
@@ -202,15 +208,140 @@ Utiliza los datos de reservas de la sede de Cádiz (excluyendo la reserva errón
 
 **4.1.** **Modelo jerárquico.** Representa la información en forma de árbol, tomando como raíz la *Sede Cádiz*, después las *clases* y, por debajo, los *socios*. Indica qué datos aparecen **duplicados** y explica por qué este modelo obliga a ello.
 
+Sede Cádiz
+│
+├── Pilates
+│   ├── Lucía Ramos
+│   └── Ana Torres
+│
+├── Spinning
+│   ├── Lucía Ramos
+│   └── Pedro Díaz
+│
+└── Yoga
+    └── Ana Torres
+
+Datos duplicados:
+- Lucía Ramos aparece dos veces: Pilates y Spinning.
+- Ana Torres aparece dos veces: Pilates y Yoga.
+Esto ocurre porque en el modelo jerárquico cada elemento solo puede tener un padre. Como un socio puede estar apuntado a varias clases, hay que repetir sus datos debajo de cada clase.
+
 **4.2.** **Modelo en red.** Representa la misma información como red. Señala qué nodos tienen **más de un padre** y explica qué ventaja supone respecto al modelo jerárquico.
+
+                 Sede Cádiz
+                     │
+        ┌────────────┼────────────┐
+        │            │            │
+     Pilates      Spinning       Yoga
+        │          /     \          │
+        │         /       \         │
+    Lucía ───────┘         Pedro    │
+        │                           │
+        └────────────────────── Ana ┘
+
+Pilates ─── Lucía Ramos
+         └─ Ana Torres
+
+Spinning ── Lucía Ramos
+          └ Pedro Díaz
+
+Yoga ────── Ana Torres
+
+La ventaja frente al modelo jerárquico es que un elemento puede tener varios padres, por lo que no es necesario duplicar los datos de los socios.     
 
 **4.3.** **Modelo relacional.**
 
+SOCIOS
+
+| ID_SOCIO | NOMBRE |
+|---|---|
+| 1 | Lucía Ramos |
+| 2 | Pedro Díaz |
+| 3 | Ana Torres |
+
+CLASES
+
+| ID_CLASE | CLASE |
+|---|---|
+| 1 | Pilates |
+| 2 | Spinning |
+| 3 | Yoga |
+
+RESERVAS
+
+| ID_SOCIO | ID_CLASE |
+|---|---|
+| 1 | 1 |
+| 1 | 2 |
+| 2 | 2 |
+| 3 | 1 |
+| 3 | 3 |
+
+Así, Lucía y Ana no necesitan aparecer repetidas en la tabla de socios. La tabla RESERVAS relaciona cada socio con las clases que tiene reservadas.
+
 - **a)** Diseña las tablas `SOCIOS`, `CLASES` y `RESERVAS` con sus campos e indica la **clave primaria** y las **claves externas** de cada una.
+
+SOCIOS
+
+| Campo | Clave |
+|---|---|
+| `ID_SOCIO` | **Clave primaria (PK)** |
+| `NOMBRE` | — |
+
+CLASES
+
+| Campo | Clave |
+|---|---|
+| `ID_CLASE` | **Clave primaria (PK)** |
+| `NOMBRE_CLASE` | — |
+
+RESERVAS
+
+| Campo | Clave |
+|---|---|
+| `ID_SOCIO` | **Clave externa (FK)** |
+| `ID_CLASE` | **Clave externa (FK)** |
+| `ID_SOCIO + ID_CLASE` | **Clave primaria (PK)** |
+
+
 - **b)** Rellena las tres tablas con los datos anteriores.
+
+SOCIOS
+
+| ID_SOCIO | NOMBRE |
+|---|---|
+| 1 | Lucía Ramos |
+| 2 | Pedro Díaz |
+| 3 | Ana Torres |
+
+CLASES
+
+| ID_CLASE | NOMBRE_CLASE |
+|---|---|
+| 1 | Pilates |
+| 2 | Spinning |
+| 3 | Yoga |
+
+RESERVAS
+
+| ID_SOCIO | ID_CLASE |
+|---|---|
+| 1 | 1 |
+| 1 | 2 |
+| 2 | 2 |
+| 3 | 1 |
+| 3 | 3 |
+
 - **c)** Explica por qué es necesaria la tabla `RESERVAS` y por qué en ella un mismo valor de clave externa puede repetirse.
 
+La tabla RESERVAS es necesaria para relacionar a los socios con las clases, ya que un socio puede reservar varias clases y una clase puede tener varios socios.
+Un mismo valor de clave externa puede repetirse porque, por ejemplo, Lucía Ramos puede tener varias reservas. Su ID_SOCIO aparecerá varias veces en RESERVAS, una por cada clase que reserve.
+
 **4.4.** Justifica cuál de los tres modelos es el adecuado para Centros Deportivos Atlántico. Indica además **una parte del sistema** de la empresa (actual o futura) en la que una estructura jerárquica sí tendría sentido y por qué.
+
+El modelo relacional es el más adecuado para Centros Deportivos Atlántico porque permite relacionar fácilmente socios, clases y reservas sin tener que repetir información. Además, facilita consultar y modificar los datos.
+Una estructura jerárquica sí tendría sentido, por ejemplo, para organizar las sedes y sus departamentos.
+Tiene sentido porque cada departamento pertenece a una única sede, formando una estructura de tipo padre-hijo.
 
 ---
 
