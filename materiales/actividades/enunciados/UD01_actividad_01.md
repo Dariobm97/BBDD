@@ -168,16 +168,16 @@ En cambio, Centros Deportivos Atlántico tiene unos 1.800 socios, varias sedes, 
 
 | Nº | Situación | Elemento del SGBD | Tipo de usuario | Justificación |
 |---|---|---|---|---|
-| 1 | La gerente decide que a partir de ahora se registrará un teléfono de emergencia de cada socio. El cambio se aplicará modificando la estructura de la tabla `SOCIOS`. | DDL | Administrador de datos | El encargado cambia la estructura de la base de datos una tabla en este caso y se ha de añadir nuevos datos en este caso un teléfono de emergencia|
-| 2 | El técnico ejecuta `CREATE TABLE RESERVAS (...)`. | DDL | Administrador de la base de datos | crea una nueva tabla |
-| 3 | Una recepcionista consulta, desde el programa de recepción, qué clases del jueves tienen plazas libres. | DML | Usuario final | Hace una consulta de información |
-| 4 | Se ejecuta `GRANT SELECT ON CLASES TO monitores;` | DCL | Administrador de la BBDD | Dando permisos a monitores |
-| 5 | El SGBD rechaza una reserva porque el número de socio no existe. | núcleo | ninguno | Es el programa el que actúa |
-| 6 | Dos recepcionistas intentan asignar a la vez la última plaza de Spinning; el SGBD solo acepta una de las dos operaciones. | núcleo  | ninguno  | El programa actúa |
-| 7 | El técnico consulta qué tablas existen, qué campos tienen y qué usuarios tienen permisos sobre ellas. | DML |  | |
-| 8 | Administración genera el informe mensual de cuotas con un asistente gráfico, sin escribir código. | utilidades |  | |
-| 9 | Se cargan en la nueva base de datos los ficheros antiguos de las tres sedes. | núcleo |  | |
-| 10 | La empresa de desarrollo programa la pantalla de reservas de la app, que resta una plaza libre cada vez que un socio reserva. | DML | programador de aplicaciones | La aplicación modifica los datos al realizar una reserva |
+| 1 | La gerente decide que a partir de ahora se registrará un teléfono de emergencia de cada socio. El cambio se aplicará modificando la estructura de la tabla `SOCIOS`. | **DDL** | **Administrador de datos** | Se modifica la estructura de la base de datos añadiendo un nuevo campo a la tabla `SOCIOS`. |
+| 2 | El técnico ejecuta `CREATE TABLE RESERVAS (...)`. | **DDL** | **Administrador de la base de datos** | `CREATE TABLE` es una instrucción DDL que permite crear una nueva tabla en la base de datos. |
+| 3 | Una recepcionista consulta, desde el programa de recepción, qué clases del jueves tienen plazas libres. | **DML** | **Usuario final** | La recepcionista realiza una consulta para obtener información almacenada en la base de datos. |
+| 4 | Se ejecuta `GRANT SELECT ON CLASES TO monitores;` | **DCL** | **Administrador de la base de datos** | `GRANT` sirve para conceder permisos de acceso a los usuarios sobre los datos. |
+| 5 | El SGBD rechaza una reserva porque el número de socio no existe. | **Núcleo** | **Ninguno** | El núcleo del SGBD comprueba automáticamente las restricciones de integridad y rechaza una operación que no las cumple. |
+| 6 | Dos recepcionistas intentan asignar a la vez la última plaza de Spinning; el SGBD solo acepta una de las dos operaciones. | **Núcleo** | **Ninguno** | El núcleo controla la concurrencia y las transacciones para evitar que dos operaciones simultáneas produzcan un conflicto. |
+| 7 | El técnico consulta qué tablas existen, qué campos tienen y qué usuarios tienen permisos sobre ellas. | **Diccionario de datos** | **Administrador de la base de datos** | El diccionario de datos almacena información sobre la estructura de la base de datos y los permisos de los usuarios. |
+| 8 | Administración genera el informe mensual de cuotas con un asistente gráfico, sin escribir código. | **Utilidades** | **Usuario final** | Utiliza una herramienta del SGBD que permite generar informes mediante un asistente, sin necesidad de escribir instrucciones. |
+| 9 | Se cargan en la nueva base de datos los ficheros antiguos de las tres sedes. | **Utilidades** | **Administrador de la base de datos** | Las utilidades del SGBD permiten realizar tareas de carga, importación y migración de datos. |
+| 10 | La empresa de desarrollo programa la pantalla de reservas de la app, que resta una plaza libre cada vez que un socio reserva. | **DML** | **Programador de aplicaciones** | El programador desarrolla una aplicación que modifica los datos de la base de datos al realizar una reserva. |
 
 **3.2.** Analiza los cambios siguientes. Para cada uno, indica **qué nivel de la arquitectura** de la base de datos se modifica (interno, conceptual o externo), **qué tipo de independencia** de datos interviene (si procede) y **qué programas o usuarios se ven afectados**.
 
@@ -349,16 +349,19 @@ Tiene sentido porque cada departamento pertenece a una única sede, formando una
 
 **5.1.** Clasifica los siguientes sistemas completando la tabla. Si un sistema **no es un SGBD**, indícalo y explica el motivo.
 
-| Sistema | ¿Es un SGBD? | Modelo de datos | Ubicación de la información (centralizada / distribuida) | Usuarios (uno / varios simultáneos) | Configuración (monoequipo / cliente-servidor / con servidor de aplicaciones / distribuida) |
+| Sistema | ¿Es un SGBD? | Modelo de datos | Ubicación de la información | Usuarios | Configuración |
 |---|---|---|---|---|---|
-| A. El sistema actual de cada sede, con ficheros en el ordenador de recepción. | | | | | |
-| B. El entrenador personal de la actividad 2.3 instala SQLite en su portátil para gestionar a sus clientes. | | | | | |
-| C. Un SGBD jerárquico, similar a IBM IMS, instalado en un servidor central al que se conectan varios terminales. | | | | | |
-| D. MySQL instalado en un servidor de la sede de Cádiz, al que se conectan las recepciones de las tres sedes. | | | | | |
-| E. La app móvil se comunica con un servidor de aplicaciones que, a su vez, consulta una base de datos PostgreSQL. | | | | | |
-| F. Tras la expansión, cada zona tiene su propio servidor PostgreSQL y el conjunto funciona como una única base de datos. | | | | | |
+| A. Sistema actual de cada sede, con ficheros en el ordenador de recepción. | No | Ficheros | Centralizada en cada ordenador | Uno | Monoequipo |
+| B. SQLite instalado en un portátil para gestionar clientes. | Sí | Relacional | Centralizada | Uno | Monoequipo |
+| C. SGBD jerárquico similar a IBM IMS, en un servidor central con varios terminales. | Sí | Jerárquico | Centralizada | Varios simultáneos | Cliente-servidor |
+| D. MySQL en un servidor de Cádiz al que se conectan las tres sedes. | Sí | Relacional | Centralizada | Varios simultáneos | Cliente-servidor |
+| E. App móvil → servidor de aplicaciones → PostgreSQL. | Sí | Relacional | Centralizada | Varios simultáneos | Con servidor de aplicaciones |
+| F. Cada zona tiene su propio servidor PostgreSQL y todos funcionan como una única base de datos. | Sí | Relacional | Distribuida | Varios simultáneos | Distribuida |
 
 **5.2.** Los ficheros de las tres sedes ya están repartidos en tres ordenadores distintos. ¿Puede considerarse el sistema actual una **base de datos distribuida**? Justifica tu respuesta.
+
+Aunque los datos están repartidos entre tres ordenadores distintos, simplemente son ficheros independientes de cada sede. No existe un SGBD que gestione esos datos como una única base de datos ni que permita trabajar con ellos de forma conjunta.
+Por tanto, es un sistema de ficheros independientes, no una base de datos distribuida.
 
 ---
 
@@ -368,19 +371,43 @@ Tiene sentido porque cada departamento pertenece a una única sede, formando una
 
 | Opción | ¿Dónde se encuentra físicamente la información? | Ventaja principal para Atlántico | Inconveniente principal para Atlántico |
 |---|---|---|---|
-| 1. Cada sede con su propio SGBD en el ordenador de recepción (monoequipo). | | | |
-| 2. Un único servidor central en Cádiz al que se conectan todas las sedes (cliente-servidor). | | | |
-| 3. Un servidor en cada zona (Cádiz, Sevilla y Málaga) formando una base de datos distribuida. | | | |
-| 4. Cualquiera de las anteriores con un servidor de aplicaciones intermedio para la app móvil. | | | |
+| 1. Cada sede con su propio SGBD en el ordenador de recepción (monoequipo). | En el ordenador de cada una de las 20 sedes. | Es sencilla y barata de instalar y mantener en cada sede. | La información queda separada y es difícil tener una visión conjunta de las 20 sedes. |
+| 2. Un único servidor central en Cádiz al que se conectan todas las sedes (cliente-servidor). | En un único servidor situado en Cádiz. | Todos los datos están centralizados y todas las sedes pueden acceder a la misma información. | Si el servidor o la conexión con Cádiz falla, puede afectar al acceso de todas las sedes. |
+| 3. Un servidor en cada zona (Cádiz, Sevilla y Málaga) formando una base de datos distribuida. | Repartida entre los servidores de Cádiz, Sevilla y Málaga. | Reparte la carga y permite que cada zona tenga sus datos más cerca, manteniendo el sistema como una única BD. | Es más compleja y cara de administrar y mantener. |
+| 4. Cualquiera de las anteriores con un servidor de aplicaciones intermedio para la app móvil. | La información sigue estando donde corresponda según la opción elegida; el servidor de aplicaciones se sitúa entre la app y el SGBD. | Aumenta la seguridad y permite que la app móvil acceda a los datos sin conectarse directamente al SGBD. | Añade otro componente que hay que mantener y puede aumentar la complejidad del sistema. |
 
 **6.2.** Describe, paso a paso, qué ocurre desde que una socia pulsa *Reservar* en la app hasta que recibe la confirmación. Indica en qué **capa** (presentación, lógica o datos) se produce cada paso y en qué capa debe comprobarse que quedan plazas libres. Justifica esto último.
+
+1. **La socia pulsa el botón “Reservar” en la app.**  
+   → **Capa de presentación.** La app recoge la acción de la usuaria y envía la petición.
+
+2. **La petición llega al servidor de aplicaciones.**  
+   → **Capa de lógica.** El servidor recibe la solicitud y comprueba qué reserva se quiere realizar.
+
+3. **La lógica solicita a la base de datos las plazas disponibles de la clase.**  
+   → **Capa de datos.** El SGBD consulta la información de la clase y devuelve las plazas disponibles.
+
+4. **Se comprueba que todavía queda alguna plaza libre.**  
+   → **Capa de lógica.** Aquí debe comprobarse que la plaza está disponible antes de confirmar la reserva.
+
+5. **Si hay plaza, se registra la reserva y se actualiza el número de plazas disponibles.**  
+   → **Capa de datos.** El SGBD modifica los datos de la reserva y de las plazas.
+
+6. **El resultado vuelve al servidor de aplicaciones y después a la app.**  
+   → **Capa de lógica → capa de presentación.** La aplicación recibe el resultado y muestra a la socia que la reserva se ha realizado correctamente.
 
 **6.3.** Analiza cómo responderían la opción 2 (centralizada) y la opción 3 (distribuida) ante estas situaciones:
 
 - **a)** Un lunes a las 19:00, hora punta, se produce un corte eléctrico en el edificio donde está el servidor de Cádiz.
+Centralizada: Al estar toda la información en el servidor de Cádiz, todas las sedes perderían el acceso a la base de datos mientras el servidor esté apagado.
+Distribuida: Si falla el servidor de Cádiz, Sevilla y Málaga podrían seguir funcionando con sus servidores locales, aunque algunas operaciones podrían verse afectadas si necesitan información que estaba en Cádiz.
+
 - **b)** Lucía Ramos, con tarifa Multisede y dada de alta en Cádiz, reserva una clase en una sede de Málaga. Explica qué debe ocurrir para que la socia **perciba un único sistema** y qué dificultad técnica supone.
+Centralizada: La sede de Málaga consulta directamente el servidor central de Cádiz, por lo que puede comprobar los datos de Lucía y realizar la reserva sobre la misma base de datos.
+Distribuida: El sistema debe consultar y sincronizar los datos entre los servidores para comprobar que Lucía existe, que tiene tarifa Multisede y que puede reservar en Málaga.
 
 **6.4.** Recomienda razonadamente una de las opciones para la empresa dentro de tres años, valorando tanto sus ventajas como sus inconvenientes.
+Recomendaría la opción 3, distribuida, porque con 20 sedes sería más segura y permitiría que un problema en un servidor no afectase a toda la empresa. Aunque es más cara y complicada de mantener, creo que para una empresa que está creciendo compensa.
 
 ---
 
