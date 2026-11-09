@@ -207,7 +207,9 @@ Utiliza los datos de reservas de la sede de Cádiz (excluyendo la reserva errón
 - Ana Torres → Pilates y Yoga.
 
 **4.1.** **Modelo jerárquico.** Representa la información en forma de árbol, tomando como raíz la *Sede Cádiz*, después las *clases* y, por debajo, los *socios*. Indica qué datos aparecen **duplicados** y explica por qué este modelo obliga a ello.
-
+```mermaid
+flowchart TD
+A[SEDE] --> B
 Sede Cádiz
 │
 ├── Pilates
@@ -228,8 +230,6 @@ Esto ocurre porque en el modelo jerárquico cada elemento solo puede tener un pa
 
 **4.2.** **Modelo en red.** Representa la misma información como red. Señala qué nodos tienen **más de un padre** y explica qué ventaja supone respecto al modelo jerárquico.
 
-
-
 Pilates ─── Lucía Ramos
          └─ Ana Torres
 
@@ -249,6 +249,8 @@ SOCIOS
 | 1 | Lucía Ramos |
 | 2 | Pedro Díaz |
 | 3 | Ana Torres |
+
+Socios(ID_Socio PK, nombre)
 
 CLASES
 
@@ -342,12 +344,12 @@ Tiene sentido porque cada departamento pertenece a una única sede, formando una
 
 | Sistema | ¿Es un SGBD? | Modelo de datos | Ubicación de la información | Usuarios | Configuración |
 |---|---|---|---|---|---|
-| A. Sistema actual de cada sede, con ficheros en el ordenador de recepción. | No | Ficheros | Centralizada en cada ordenador | Uno | Monoequipo |
+| A. Sistema actual de cada sede, con ficheros en el ordenador de recepción. | No | Ficheros | Distribuida | Uno | Monoequipo |
 | B. SQLite instalado en un portátil para gestionar clientes. | Sí | Relacional | Centralizada | Uno | Monoequipo |
-| C. SGBD jerárquico similar a IBM IMS, en un servidor central con varios terminales. | Sí | Jerárquico | Centralizada | Varios simultáneos | Cliente-servidor |
-| D. MySQL en un servidor de Cádiz al que se conectan las tres sedes. | Sí | Relacional | Centralizada | Varios simultáneos | Cliente-servidor |
-| E. App móvil → servidor de aplicaciones → PostgreSQL. | Sí | Relacional | Centralizada | Varios simultáneos | Con servidor de aplicaciones |
-| F. Cada zona tiene su propio servidor PostgreSQL y todos funcionan como una única base de datos. | Sí | Relacional | Distribuida | Varios simultáneos | Distribuida |
+| C. SGBD jerárquico similar a IBM IMS, en un servidor central con varios terminales. | Sí | Jerárquico | Centralizada | Multiusuario | Cliente-servidor |
+| D. MySQL en un servidor de Cádiz al que se conectan las tres sedes. | Sí | Relacional | Centralizada | Multiusuario | Cliente-servidor |
+| E. La app móvil se comunica con un servidor de aplicaciones que a su vez, onsulta una base de datos PostgreSQL. | Sí | Relacional | Centralizada | Multiusuario | Con servidor de aplicaciones |
+| F. Tras la expansion, cada zona tiene su propio servidor PostgreSQL y todos funcionan como una única base de datos. | Sí | Relacional | Distribuida | Multiusuario | Distribuida |
 
 **5.2.** Los ficheros de las tres sedes ya están repartidos en tres ordenadores distintos. ¿Puede considerarse el sistema actual una **base de datos distribuida**? Justifica tu respuesta.
 
@@ -375,7 +377,7 @@ Por tanto, es un sistema de ficheros independientes, no una base de datos distri
 2. **La petición llega al servidor de aplicaciones.**  
    → **Capa de lógica.** El servidor recibe la solicitud y comprueba qué reserva se quiere realizar.
 
-3. **La lógica solicita a la base de datos las plazas disponibles de la clase.**  
+3. **La lógica solicita a la base de datos las plazas disponibles de la clase.**
    → **Capa de datos.** El SGBD consulta la información de la clase y devuelve las plazas disponibles.
 
 4. **Se comprueba que todavía queda alguna plaza libre.**  
