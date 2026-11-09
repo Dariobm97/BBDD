@@ -184,7 +184,7 @@ En cambio, Centros Deportivos Atlántico tiene unos 1.800 socios, varias sedes, 
 | Cambio | Nivel modificado | Independencia | ¿A quién afecta? |
 |---|---|---|---|
 | a) El técnico reorganiza el almacenamiento de `SOCIOS` y crea un índice sobre el DNI para acelerar las búsquedas. | interno | física | Nada se ve afectado  |
-| b) Se añade el campo `TELEFONO_EMERGENCIA` a `SOCIOS`. | Conceptual | Lógica | |
+| b) Se añade el campo `TELEFONO_EMERGENCIA` a `SOCIOS`. | Conceptual | Lógica | Solo a los que ven el campo nuevo |
 | c) Se crea una vista para los monitores que muestra solo el nombre del socio y sus clases. | Externo | Lógica | Sólo afecta a los monitores  |
 | d) Se elimina el campo `FAX` de `SOCIOS`, que solo usaba el antiguo programa de envío de cartas. | Conceptual | Lógica | Afecta al antiguo programa |
 
@@ -228,16 +228,7 @@ Esto ocurre porque en el modelo jerárquico cada elemento solo puede tener un pa
 
 **4.2.** **Modelo en red.** Representa la misma información como red. Señala qué nodos tienen **más de un padre** y explica qué ventaja supone respecto al modelo jerárquico.
 
-                 Sede Cádiz
-                     │
-        ┌────────────┼────────────┐
-        │            │            │
-     Pilates      Spinning       Yoga
-        │          /     \          │
-        │         /       \         │
-    Lucía ───────┘         Pedro    │
-        │                           │
-        └────────────────────── Ana ┘
+
 
 Pilates ─── Lucía Ramos
          └─ Ana Torres
