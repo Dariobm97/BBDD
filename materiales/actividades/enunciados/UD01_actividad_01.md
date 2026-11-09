@@ -401,11 +401,13 @@ Por tanto, es un sistema de ficheros independientes, no una base de datos distri
 - **a)** Un lunes a las 19:00, hora punta, se produce un corte eléctrico en el edificio donde está el servidor de Cádiz.
 
 Centralizada: Al estar toda la información en el servidor de Cádiz, todas las sedes perderían el acceso a la base de datos mientras el servidor esté apagado.
+
 Distribuida: Si falla el servidor de Cádiz, Sevilla y Málaga podrían seguir funcionando con sus servidores locales, aunque algunas operaciones podrían verse afectadas si necesitan información que estaba en Cádiz.
 
 - **b)** Lucía Ramos, con tarifa Multisede y dada de alta en Cádiz, reserva una clase en una sede de Málaga. Explica qué debe ocurrir para que la socia **perciba un único sistema** y qué dificultad técnica supone.
 
 Centralizada: La sede de Málaga consulta directamente el servidor central de Cádiz, por lo que puede comprobar los datos de Lucía y realizar la reserva sobre la misma base de datos.
+
 Distribuida: El sistema debe consultar y sincronizar los datos entre los servidores para comprobar que Lucía existe, que tiene tarifa Multisede y que puede reservar en Málaga.
 
 **6.4.** Recomienda razonadamente una de las opciones para la empresa dentro de tres años, valorando tanto sus ventajas como sus inconvenientes.
