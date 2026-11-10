@@ -133,27 +133,33 @@ En cambio, Centros Deportivos Atlántico tiene unos 1.800 socios, varias sedes, 
 
 | Nº | Situación | Elemento del SGBD | Tipo de usuario | Justificación |
 |---|---|---|---|---|
-| 1 | La gerente decide que a partir de ahora se registrará un teléfono de emergencia de cada socio. El cambio se aplicará modificando la estructura de la tabla `SOCIOS`. | | | |
-| 2 | El técnico ejecuta `CREATE TABLE RESERVAS (...)`. | | | |
-| 3 | Una recepcionista consulta, desde el programa de recepción, qué clases del jueves tienen plazas libres. | | | |
-| 4 | Se ejecuta `GRANT SELECT ON CLASES TO monitores;` | | | |
-| 5 | El SGBD rechaza una reserva porque el número de socio no existe. | | | |
-| 6 | Dos recepcionistas intentan asignar a la vez la última plaza de Spinning; el SGBD solo acepta una de las dos operaciones. | | | |
-| 7 | El técnico consulta qué tablas existen, qué campos tienen y qué usuarios tienen permisos sobre ellas. | | | |
-| 8 | Administración genera el informe mensual de cuotas con un asistente gráfico, sin escribir código. | | | |
-| 9 | Se cargan en la nueva base de datos los ficheros antiguos de las tres sedes. | | | |
-| 10 | La empresa de desarrollo programa la pantalla de reservas de la app, que resta una plaza libre cada vez que un socio reserva. | | | |
+| 1 | La gerente decide que a partir de ahora se registrará un teléfono de emergencia de cada socio. El cambio se aplicará modificando la estructura de la tabla `SOCIOS`. | **DDL** | **Administrador de datos** | Se modifica la estructura de la base de datos añadiendo un nuevo campo a la tabla `SOCIOS`. |
+| 2 | El técnico ejecuta `CREATE TABLE RESERVAS (...)`. | **DDL** | **Administrador de la base de datos** | `CREATE TABLE` es una instrucción DDL que permite crear una nueva tabla en la base de datos. |
+| 3 | Una recepcionista consulta, desde el programa de recepción, qué clases del jueves tienen plazas libres. | **DML** | **Usuario final** | La recepcionista realiza una consulta para obtener información almacenada en la base de datos. |
+| 4 | Se ejecuta `GRANT SELECT ON CLASES TO monitores;` | **DCL** | **Administrador de la base de datos** | `GRANT` sirve para conceder permisos de acceso a los usuarios sobre los datos. |
+| 5 | El SGBD rechaza una reserva porque el número de socio no existe. | **Núcleo** | **Ninguno** | El núcleo del SGBD comprueba automáticamente las restricciones de integridad y rechaza una operación que no las cumple. |
+| 6 | Dos recepcionistas intentan asignar a la vez la última plaza de Spinning; el SGBD solo acepta una de las dos operaciones. | **Núcleo** | **Ninguno** | El núcleo controla la concurrencia y las transacciones para evitar que dos operaciones simultáneas produzcan un conflicto. |
+| 7 | El técnico consulta qué tablas existen, qué campos tienen y qué usuarios tienen permisos sobre ellas. | **Diccionario de datos** | **Administrador de la base de datos** | El diccionario de datos almacena información sobre la estructura de la base de datos y los permisos de los usuarios. |
+| 8 | Administración genera el informe mensual de cuotas con un asistente gráfico, sin escribir código. | **Utilidades** | **Usuario final** | Utiliza una herramienta del SGBD que permite generar informes mediante un asistente, sin necesidad de escribir instrucciones. |
+| 9 | Se cargan en la nueva base de datos los ficheros antiguos de las tres sedes. | **Utilidades** | **Administrador de la base de datos** | Las utilidades del SGBD permiten realizar tareas de carga, importación y migración de datos. |
+| 10 | La empresa de desarrollo programa la pantalla de reservas de la app, que resta una plaza libre cada vez que un socio reserva. | **DML** | **Programador de aplicaciones** | El programador desarrolla una aplicación que modifica los datos de la base de datos al realizar una reserva. |
 
 **3.2.** Analiza los cambios siguientes. Para cada uno, indica **qué nivel de la arquitectura** de la base de datos se modifica (interno, conceptual o externo), **qué tipo de independencia** de datos interviene (si procede) y **qué programas o usuarios se ven afectados**.
 
 | Cambio | Nivel modificado | Independencia | ¿A quién afecta? |
 |---|---|---|---|
-| a) El técnico reorganiza el almacenamiento de `SOCIOS` y crea un índice sobre el DNI para acelerar las búsquedas. | | | |
-| b) Se añade el campo `TELEFONO_EMERGENCIA` a `SOCIOS`. | | | |
-| c) Se crea una vista para los monitores que muestra solo el nombre del socio y sus clases. | | | |
-| d) Se elimina el campo `FAX` de `SOCIOS`, que solo usaba el antiguo programa de envío de cartas. | | | |
+| a) El técnico reorganiza el almacenamiento de `SOCIOS` y crea un índice sobre el DNI para acelerar las búsquedas. | interno | física | Nada se ve afectado  |
+| b) Se añade el campo `TELEFONO_EMERGENCIA` a `SOCIOS`. | Conceptual | Lógica | Solo a los que ven el campo nuevo |
+| c) Se crea una vista para los monitores que muestra solo el nombre del socio y sus clases. | Externo | Lógica | Sólo afecta a los monitores  |
+| d) Se elimina el campo `FAX` de `SOCIOS`, que solo usaba el antiguo programa de envío de cartas. | Conceptual | Lógica | Afecta al antiguo programa |
 
 Por último, compara el cambio *b* con la incidencia **I6** y explica qué ha cambiado gracias al SGBD.
+
+En I6, al ampliar el campo TELÉFONO, el programa de recibos dejó de funcionar. Esto muestra que el programa dependía de la estructura de los datos.
+
+En el cambio b, se añade TELEFONO_EMERGENCIA a SOCIOS. Gracias al SGBD y a la arquitectura de tres niveles, este cambio puede hacerse sin afectar necesariamente a los programas que no utilizan ese nuevo campo.
+
+En decir el SGBD permite que los cambios en la estructura de los datos afecten lo menos posible a los programas. Esto es la independencia de datos.
 
 ---
 
@@ -166,16 +172,144 @@ Utiliza los datos de reservas de la sede de Cádiz (excluyendo la reserva errón
 - Ana Torres → Pilates y Yoga.
 
 **4.1.** **Modelo jerárquico.** Representa la información en forma de árbol, tomando como raíz la *Sede Cádiz*, después las *clases* y, por debajo, los *socios*. Indica qué datos aparecen **duplicados** y explica por qué este modelo obliga a ello.
+```mermaid
+flowchart TD
+    A["Sede Cádiz"]
+
+    A --> B["Pilates"]
+    A --> C["Spinning"]
+    A --> D["Yoga"]
+
+    B --> E["Lucía Ramos"]
+    B --> F["Ana Torres"]
+
+    C --> E
+    C --> G["Pedro Díaz"]
+
+    D --> F
+```
+
+Datos duplicados:
+- Lucía Ramos aparece dos veces: Pilates y Spinning.
+- Ana Torres aparece dos veces: Pilates y Yoga.
+Esto ocurre porque en el modelo jerárquico cada elemento solo puede tener un padre. Como un socio puede estar apuntado a varias clases, hay que repetir sus datos debajo de cada clase.
 
 **4.2.** **Modelo en red.** Representa la misma información como red. Señala qué nodos tienen **más de un padre** y explica qué ventaja supone respecto al modelo jerárquico.
 
+```mermaid
+graph LR
+    A["Sede Cádiz"]
+
+    A --> B["Pilates"]
+    A --> C["Spinning"]
+    A --> D["Yoga"]
+
+    B --> E["Lucía Ramos"]
+    B --> F["Ana Torres"]
+
+    C --> E
+    C --> G["Pedro Díaz"]
+
+    D --> F
+```
+
+La ventaja frente al modelo jerárquico es que un elemento puede tener varios padres, por lo que no es necesario duplicar los datos de los socios.     
+
 **4.3.** **Modelo relacional.**
 
+SOCIOS
+
+| ID_SOCIO | NOMBRE |
+|---|---|
+| 1 | Lucía Ramos |
+| 2 | Pedro Díaz |
+| 3 | Ana Torres |
+
+Socios(ID_Socio PK, nombre)
+
+CLASES
+
+| ID_CLASE | CLASE |
+|---|---|
+| 1 | Pilates |
+| 2 | Spinning |
+| 3 | Yoga |
+
+RESERVAS
+
+| ID_SOCIO | ID_CLASE |
+|---|---|
+| 1 | 1 |
+| 1 | 2 |
+| 2 | 2 |
+| 3 | 1 |
+| 3 | 3 |
+
+Así, Lucía y Ana no necesitan aparecer repetidas en la tabla de socios. La tabla RESERVAS relaciona cada socio con las clases que tiene reservadas.
+
 - **a)** Diseña las tablas `SOCIOS`, `CLASES` y `RESERVAS` con sus campos e indica la **clave primaria** y las **claves externas** de cada una.
+
+SOCIOS
+
+| Campo | Clave |
+|---|---|
+| `ID_SOCIO` | **Clave primaria (PK)** |
+| `NOMBRE` | — |
+
+CLASES
+
+| Campo | Clave |
+|---|---|
+| `ID_CLASE` | **Clave primaria (PK)** |
+| `NOMBRE_CLASE` | — |
+
+RESERVAS
+
+| Campo | Clave |
+|---|---|
+| `ID_SOCIO` | **Clave externa (FK)** |
+| `ID_CLASE` | **Clave externa (FK)** |
+| `ID_SOCIO + ID_CLASE` | **Clave primaria (PK)** |
+
+
 - **b)** Rellena las tres tablas con los datos anteriores.
+
+SOCIOS
+
+| ID_SOCIO | NOMBRE |
+|---|---|
+| 1 | Lucía Ramos |
+| 2 | Pedro Díaz |
+| 3 | Ana Torres |
+
+CLASES
+
+| ID_CLASE | NOMBRE_CLASE |
+|---|---|
+| 1 | Pilates |
+| 2 | Spinning |
+| 3 | Yoga |
+
+RESERVAS
+
+| ID_SOCIO | ID_CLASE |
+|---|---|
+| 1 | 1 |
+| 1 | 2 |
+| 2 | 2 |
+| 3 | 1 |
+| 3 | 3 |
+
 - **c)** Explica por qué es necesaria la tabla `RESERVAS` y por qué en ella un mismo valor de clave externa puede repetirse.
 
+La tabla RESERVAS es necesaria para relacionar a los socios con las clases, ya que un socio puede reservar varias clases y una clase puede tener varios socios.
+Un mismo valor de clave externa puede repetirse porque, por ejemplo, Lucía Ramos puede tener varias reservas. Su ID_SOCIO aparecerá varias veces en RESERVAS, una por cada clase que reserve.
+
 **4.4.** Justifica cuál de los tres modelos es el adecuado para Centros Deportivos Atlántico. Indica además **una parte del sistema** de la empresa (actual o futura) en la que una estructura jerárquica sí tendría sentido y por qué.
+
+El modelo relacional es el más adecuado para Centros Deportivos Atlántico porque permite relacionar fácilmente socios, clases y reservas sin tener que repetir información. Además, facilita consultar y modificar los datos.
+Una estructura jerárquica sí tendría sentido, por ejemplo, para organizar las sedes y sus departamentos.
+Tiene sentido porque cada departamento pertenece a una única sede, formando una estructura de tipo padre-hijo.
 
 ---
 
@@ -183,16 +317,19 @@ Utiliza los datos de reservas de la sede de Cádiz (excluyendo la reserva errón
 
 **5.1.** Clasifica los siguientes sistemas completando la tabla. Si un sistema **no es un SGBD**, indícalo y explica el motivo.
 
-| Sistema | ¿Es un SGBD? | Modelo de datos | Ubicación de la información (centralizada / distribuida) | Usuarios (uno / varios simultáneos) | Configuración (monoequipo / cliente-servidor / con servidor de aplicaciones / distribuida) |
+| Sistema | ¿Es un SGBD? | Modelo de datos | Ubicación de la información | Usuarios | Configuración |
 |---|---|---|---|---|---|
-| A. El sistema actual de cada sede, con ficheros en el ordenador de recepción. | | | | | |
-| B. El entrenador personal de la actividad 2.3 instala SQLite en su portátil para gestionar a sus clientes. | | | | | |
-| C. Un SGBD jerárquico, similar a IBM IMS, instalado en un servidor central al que se conectan varios terminales. | | | | | |
-| D. MySQL instalado en un servidor de la sede de Cádiz, al que se conectan las recepciones de las tres sedes. | | | | | |
-| E. La app móvil se comunica con un servidor de aplicaciones que, a su vez, consulta una base de datos PostgreSQL. | | | | | |
-| F. Tras la expansión, cada zona tiene su propio servidor PostgreSQL y el conjunto funciona como una única base de datos. | | | | | |
+| A. Sistema actual de cada sede, con ficheros en el ordenador de recepción. | No | Ficheros | Distribuida | Uno | Monoequipo |
+| B. SQLite instalado en un portátil para gestionar clientes. | Sí | Relacional | Centralizada | Uno | Monoequipo |
+| C. SGBD jerárquico similar a IBM IMS, en un servidor central con varios terminales. | Sí | Jerárquico | Centralizada | Multiusuario | Cliente-servidor |
+| D. MySQL en un servidor de Cádiz al que se conectan las tres sedes. | Sí | Relacional | Centralizada | Multiusuario | Cliente-servidor |
+| E. La app móvil se comunica con un servidor de aplicaciones que a su vez, onsulta una base de datos PostgreSQL. | Sí | Relacional | Centralizada | Multiusuario | Con servidor de aplicaciones |
+| F. Tras la expansion, cada zona tiene su propio servidor PostgreSQL y todos funcionan como una única base de datos. | Sí | Relacional | Distribuida | Multiusuario | Distribuida |
 
 **5.2.** Los ficheros de las tres sedes ya están repartidos en tres ordenadores distintos. ¿Puede considerarse el sistema actual una **base de datos distribuida**? Justifica tu respuesta.
+
+Aunque los datos están repartidos entre tres ordenadores distintos, simplemente son ficheros independientes de cada sede. No existe un SGBD que gestione esos datos como una única base de datos ni que permita trabajar con ellos de forma conjunta.
+Por tanto, es un sistema de ficheros independientes, no una base de datos distribuida.
 
 ---
 
@@ -202,19 +339,48 @@ Utiliza los datos de reservas de la sede de Cádiz (excluyendo la reserva errón
 
 | Opción | ¿Dónde se encuentra físicamente la información? | Ventaja principal para Atlántico | Inconveniente principal para Atlántico |
 |---|---|---|---|
-| 1. Cada sede con su propio SGBD en el ordenador de recepción (monoequipo). | | | |
-| 2. Un único servidor central en Cádiz al que se conectan todas las sedes (cliente-servidor). | | | |
-| 3. Un servidor en cada zona (Cádiz, Sevilla y Málaga) formando una base de datos distribuida. | | | |
-| 4. Cualquiera de las anteriores con un servidor de aplicaciones intermedio para la app móvil. | | | |
+| 1. Cada sede con su propio SGBD en el ordenador de recepción (monoequipo). | En el ordenador de cada una de las 20 sedes. | Es sencilla y barata de instalar y mantener en cada sede. | La información queda separada y es difícil tener una visión conjunta de las 20 sedes. |
+| 2. Un único servidor central en Cádiz al que se conectan todas las sedes (cliente-servidor). | En un único servidor situado en Cádiz. | Todos los datos están centralizados y todas las sedes pueden acceder a la misma información. | Si el servidor o la conexión con Cádiz falla, puede afectar al acceso de todas las sedes. |
+| 3. Un servidor en cada zona (Cádiz, Sevilla y Málaga) formando una base de datos distribuida. | Repartida entre los servidores de Cádiz, Sevilla y Málaga. | Reparte la carga y permite que cada zona tenga sus datos más cerca, manteniendo el sistema como una única BD. | Es más compleja y cara de administrar y mantener. |
+| 4. Cualquiera de las anteriores con un servidor de aplicaciones intermedio para la app móvil. | La información sigue estando donde corresponda según la opción elegida; el servidor de aplicaciones se sitúa entre la app y el SGBD. | Aumenta la seguridad y permite que la app móvil acceda a los datos sin conectarse directamente al SGBD. | Añade otro componente que hay que mantener y puede aumentar la complejidad del sistema. |
 
 **6.2.** Describe, paso a paso, qué ocurre desde que una socia pulsa *Reservar* en la app hasta que recibe la confirmación. Indica en qué **capa** (presentación, lógica o datos) se produce cada paso y en qué capa debe comprobarse que quedan plazas libres. Justifica esto último.
+
+1. **La socia pulsa el botón “Reservar” en la app.**  
+   → **Capa de presentación.** La app recoge la acción de la usuaria y envía la petición.
+
+2. **La petición llega al servidor de aplicaciones.**  
+   → **Capa de lógica.** El servidor recibe la solicitud y comprueba qué reserva se quiere realizar.
+
+3. **La lógica solicita a la base de datos las plazas disponibles de la clase.**
+   → **Capa de datos.** El SGBD consulta la información de la clase y devuelve las plazas disponibles.
+
+4. **Se comprueba que todavía queda alguna plaza libre.**  
+   → **Capa de lógica.** Aquí debe comprobarse que la plaza está disponible antes de confirmar la reserva.
+
+5. **Si hay plaza, se registra la reserva y se actualiza el número de plazas disponibles.**  
+   → **Capa de datos.** El SGBD modifica los datos de la reserva y de las plazas.
+
+6. **El resultado vuelve al servidor de aplicaciones y después a la app.**  
+   → **Capa de lógica → capa de presentación.** La aplicación recibe el resultado y muestra a la socia que la reserva se ha realizado correctamente.
 
 **6.3.** Analiza cómo responderían la opción 2 (centralizada) y la opción 3 (distribuida) ante estas situaciones:
 
 - **a)** Un lunes a las 19:00, hora punta, se produce un corte eléctrico en el edificio donde está el servidor de Cádiz.
+
+Centralizada: Al estar toda la información en el servidor de Cádiz, todas las sedes perderían el acceso a la base de datos mientras el servidor esté apagado.
+
+Distribuida: Si falla el servidor de Cádiz, Sevilla y Málaga podrían seguir funcionando con sus servidores locales, aunque algunas operaciones podrían verse afectadas si necesitan información que estaba en Cádiz.
+
 - **b)** Lucía Ramos, con tarifa Multisede y dada de alta en Cádiz, reserva una clase en una sede de Málaga. Explica qué debe ocurrir para que la socia **perciba un único sistema** y qué dificultad técnica supone.
 
+Centralizada: La sede de Málaga consulta directamente el servidor central de Cádiz, por lo que puede comprobar los datos de Lucía y realizar la reserva sobre la misma base de datos.
+
+Distribuida: El sistema debe consultar y sincronizar los datos entre los servidores para comprobar que Lucía existe, que tiene tarifa Multisede y que puede reservar en Málaga.
+
 **6.4.** Recomienda razonadamente una de las opciones para la empresa dentro de tres años, valorando tanto sus ventajas como sus inconvenientes.
+
+Recomendaría la opción 3, distribuida, porque con 20 sedes sería más segura y permitiría que un problema en un servidor no afectase a toda la empresa. Aunque es más cara y complicada de mantener, creo que para una empresa que está creciendo compensa.
 
 ---
 
