@@ -126,9 +126,9 @@ Esto se conoce como un problema de actualización de datos y provoca inconsisten
 
 | Fichero | Campos | Campo Clave |
 |---|---|---|
-|Socios|COD_SOCIO, NOMBRE, APELLIDOS, DIRECCIÓN, CÓDIGO_POSTAL, TELÉFONO, IBAN|
-|COD_MONITOR, NOMBRE, APELLIDOS|
-|Clases| COD_CLASE, NOMBRE_CLASE, COD_MONITOR, DÍA, HORA, AFORO | COD_CLASE |
+|Socios|COD_SOCIO, NOMBRE, APELLIDOS, DIRECCIÓN, CÓDIGO_POSTAL, TELÉFONO, IBAN|COD_SOCIO |
+|MONITORES|COD_MONITOR, NOMBRE, APELLIDOS|COD_MONITOR|
+|Clases| COD_CLASE, NOMBRE_CLASE, COD_MONITOR, DÍA, HORA, AFORO | COD_CLASE|
 |RESERVAS|COD_RESERVA, COD_SOCIO, COD_CLASE, FECHA_RESERVA|COD_RESERVA|
 
 
@@ -156,10 +156,6 @@ No he elegido NOMBRE porque puede haber varios socios que se llamen igual. Por e
 | I5 | Impedir que se guarden reservas de socios que no existen. | Integridad de los datos: garantiza que la información sea correcta y que las relaciones entre tablas se cumplan. |
 | I6 | Modificar la estructura del campo TELÉFONO sin tener que cambiar todos los programas que utilizan ese dato. | Independencia de los datos: permite modificar la estructura de los datos sin afectar tanto a las aplicaciones. |
 | I7 | Guardar el precio de cada tarifa en un único lugar para que todos los socios con la misma tarifa paguen lo mismo. | Control de la redundancia y consistencia: evita repetir información y que existan precios diferentes para una misma tarifa. |
-
-### Conclusión
-
-Un SGBD permite tener todos los datos mejor organizados y controlados. Gracias a sus ventajas, se reducen los errores, se evita repetir información, se mejora la seguridad y varios usuarios pueden trabajar al mismo tiempo sin problemas. Además, facilita las consultas y permite que la empresa pueda crecer sin tener que crear constantemente nuevos programas.
 
 **2.2.** La gerente se pregunta si el cambio "merece la pena". Analiza qué **inconvenientes** tendrá la implantación de un SGBD **para esta empresa en concreto** y emite una recomendación razonada.
 
