@@ -209,19 +209,20 @@ Utiliza los datos de reservas de la sede de Cádiz (excluyendo la reserva errón
 **4.1.** **Modelo jerárquico.** Representa la información en forma de árbol, tomando como raíz la *Sede Cádiz*, después las *clases* y, por debajo, los *socios*. Indica qué datos aparecen **duplicados** y explica por qué este modelo obliga a ello.
 ```mermaid
 flowchart TD
-A[SEDE] --> B
-Sede Cádiz
-│
-├── Pilates
-│   ├── Lucía Ramos
-│   └── Ana Torres
-│
-├── Spinning
-│   ├── Lucía Ramos
-│   └── Pedro Díaz
-│
-└── Yoga
-    └── Ana Torres
+    A["Sede Cádiz"]
+
+    A --> B["Pilates"]
+    A --> C["Spinning"]
+    A --> D["Yoga"]
+
+    B --> E["Lucía Ramos"]
+    B --> F["Ana Torres"]
+
+    C --> E
+    C --> G["Pedro Díaz"]
+
+    D --> F
+```
 
 Datos duplicados:
 - Lucía Ramos aparece dos veces: Pilates y Spinning.
@@ -230,13 +231,22 @@ Esto ocurre porque en el modelo jerárquico cada elemento solo puede tener un pa
 
 **4.2.** **Modelo en red.** Representa la misma información como red. Señala qué nodos tienen **más de un padre** y explica qué ventaja supone respecto al modelo jerárquico.
 
-Pilates ─── Lucía Ramos
-         └─ Ana Torres
+```mermaid
+graph LR
+    A["Sede Cádiz"]
 
-Spinning ── Lucía Ramos
-          └ Pedro Díaz
+    A --> B["Pilates"]
+    A --> C["Spinning"]
+    A --> D["Yoga"]
 
-Yoga ────── Ana Torres
+    B --> E["Lucía Ramos"]
+    B --> F["Ana Torres"]
+
+    C --> E
+    C --> G["Pedro Díaz"]
+
+    D --> F
+```
 
 La ventaja frente al modelo jerárquico es que un elemento puede tener varios padres, por lo que no es necesario duplicar los datos de los socios.     
 
