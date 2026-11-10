@@ -98,20 +98,68 @@ Personas implicadas en el proyecto:
 
 | Incidencia | Problema de los sistemas de ficheros | Explicación aplicada al caso (con datos de los extractos) |
 |---|---|---|
-| I1 | | |
-| … | | |
+| I1 |Redundancia -> inconsistencia|Los datos de Lucía están duplicados en los ficheros de las distintas sedes.|
+| I2 |Concurrencia|Había 1 plaza libre y se asignaron simultaneamente 2 personas y llegaron a haber 21 en un aforo de 20|
+| I3 |Acceso difícil y asegurar integridad|El informático enfrenta una consulta no prevista y es complicado|
+| I4 |Seguridad | Los monitores pueden acceder al ordenador de recepción y consultar el IBAN de todos los socios |
+| I5 |Integridad | En el fichero RESERVAS aparece el socio C-999, pero no existe en SOCIOS.|
+| I6 |Dependencia | Al aumentar la longitud del campo TELÉFONO, el programa de recibos dejó de funcionar.|
+| I7 |Aislamiento|Los datos están separados y no se gestionan desde un único lugar.|
 
 **1.2.** El fichero `RESERVAS` repite en cada registro el nombre del socio, el día, la hora y el monitor de cada clase.
 
 - **a)** Explica qué consecuencias tiene esta organización cuando, por ejemplo, Andrés Vela deja de impartir Spinning.
+
+Si Andrés Vela deja de impartir Spinning, habría que modificar todos los registros de RESERVAS donde aparezca su nombre.
+
+Esto supone varios problemas:
+
+    Hay que buscar y modificar muchos registros.
+
+    Se puede olvidar alguno y dejar información antigua.
+
+    Pueden aparecer datos diferentes sobre el monitor que imparte la misma clase.
+
+Esto se conoce como un problema de actualización de datos y provoca inconsistencias.
+
 - **b)** Propón una **reorganización en varios ficheros** que elimine las repeticiones, indicando los campos de cada uno y el **campo clave**.
+
+| Fichero | Campos | Campo Clave |
+|---|---|---|
+|Socios|COD_SOCIO, NOMBRE, APELLIDOS, DIRECCIÓN, CÓDIGO_POSTAL, TELÉFONO, IBAN|
+|COD_MONITOR, NOMBRE, APELLIDOS|
+|Clases| COD_CLASE, NOMBRE_CLASE, COD_MONITOR, DÍA, HORA, AFORO | COD_CLASE |
+|RESERVAS|COD_RESERVA, COD_SOCIO, COD_CLASE, FECHA_RESERVA|COD_RESERVA|
+
+
+
 - **c)** Define el **formato de registro** del nuevo fichero `SOCIOS` (campo, nombre, tipo y longitud) e indica su campo clave. Justifica por qué no has elegido `NOMBRE` como clave.
+
+He elegido COD_SOCIO como campo clave porque es único para cada socio y permite identificarlo sin confundirlo con otra persona.
+
+No he elegido NOMBRE porque puede haber varios socios que se llamen igual. Por ejemplo, podría haber dos personas llamadas Antonio García. En cambio, cada socio tiene su propio código, por lo que no se repite.
 
 ---
 
 ### Actividad 2. Utilidad de un Sistema Gestor de Bases de Datos · RA1.d 
 
 **2.1.** Explica cómo resolvería un SGBD **cada una de las incidencias** de la actividad 1. Relaciona cada solución con la **ventaja concreta** del SGBD que la hace posible.
+
+## Relación de las incidencias con las ventajas de un SGBD
+
+| Incidencia | Solución con un SGBD | Ventaja concreta del SGBD |
+| --- | --- | --- |
+| I1 | Guardar la dirección de cada socio en un único lugar para que todas las sedes consulten el mismo dato. | Control de la redundancia: evita tener datos repetidos y desactualizados. |
+| I2 | Controlar las reservas para que dos personas no puedan ocupar la misma última plaza. | Control de concurrencia: permite que varios usuarios trabajen a la vez sin provocar errores. |
+| I3 | Consultar los socios de las tres sedes por código postal sin tener que crear un programa nuevo. | Acceso flexible a los datos: permite realizar consultas fácilmente mediante SQL. |
+| I4 | Dar permisos diferentes a monitores, recepcionistas y administradores para que cada uno vea solo la información que necesita. | Seguridad: permite controlar quién puede acceder a los datos. |
+| I5 | Impedir que se guarden reservas de socios que no existen. | Integridad de los datos: garantiza que la información sea correcta y que las relaciones entre tablas se cumplan. |
+| I6 | Modificar la estructura del campo TELÉFONO sin tener que cambiar todos los programas que utilizan ese dato. | Independencia de los datos: permite modificar la estructura de los datos sin afectar tanto a las aplicaciones. |
+| I7 | Guardar el precio de cada tarifa en un único lugar para que todos los socios con la misma tarifa paguen lo mismo. | Control de la redundancia y consistencia: evita repetir información y que existan precios diferentes para una misma tarifa. |
+
+### Conclusión
+
+Un SGBD permite tener todos los datos mejor organizados y controlados. Gracias a sus ventajas, se reducen los errores, se evita repetir información, se mejora la seguridad y varios usuarios pueden trabajar al mismo tiempo sin problemas. Además, facilita las consultas y permite que la empresa pueda crecer sin tener que crear constantemente nuevos programas.
 
 **2.2.** La gerente se pregunta si el cambio "merece la pena". Analiza qué **inconvenientes** tendrá la implantación de un SGBD **para esta empresa en concreto** y emite una recomendación razonada.
 
